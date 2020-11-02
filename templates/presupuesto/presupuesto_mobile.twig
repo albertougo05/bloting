@@ -1,0 +1,375 @@
+{% extends 'base_mobile.twig' %}
+
+{% block head %}
+	{{ parent() }}
+
+	<link rel="stylesheet" href="{{ base_url() }}/css/toastr.min.css">
+	<link rel="stylesheet" href="{{ base_url() }}/css/all.css">
+	<link rel="stylesheet" href="{{ base_url() }}/css/presupuesto_mobile.css?ver=0.0.2">
+
+{% endblock %}	
+
+{% block title %} {{ titulo }} {% endblock %} 
+
+{% block navigation %}
+	{% include 'clientes/nav_cliente.twig' %}
+{% endblock %}
+
+{% block content %}
+	<div class="container mt-3">
+		<div class="row">
+			<div class="col" id="fondoComun">
+
+				<h3 class="text-right font-weight-bold pr-2">Presupuesto</h3>
+				<hr class="mt-3 mb-1" />
+
+				{# FORMULARIO #}
+				<form id="formPresup">
+					{# Para CSRF control #}
+					{{ csrf.field | raw }}
+
+					<input type="hidden" name="id" id="id" value="0">
+					<input type="hidden" name="cliente_id" id="cliente_id" value="0">
+					<input type="hidden" name="id_presup" id="id_presup">
+
+					<div class="row">
+						{# SUCURSAL #}
+						<div class="col-3 mt-3 col-label">
+							<label class="lblPresup" for="sucursal">Sucursal</label>
+						</div>		
+						<div class="col-6 mt-3">
+							<select class="form-control form-control-sm" id="sucursal" name="sucursal">
+								{% for suc in sucursales %}
+									<option value="{{ suc.id }}">{{ suc.localidad }} ({{ suc.nroSucursal }})</option>
+								{% endfor %}
+							</select>
+						</div>
+						{# ID PRESUPUESTO #}
+						<div class="col-1 mt-3 col-label">
+							<label class="lblPresup" for="id_presup_pant">ID</label>
+						</div>
+						<div class="col-2 mt-3">
+							<input type="text" class="form-control form-control-sm text-right" id="id_presup_pant" name="id_presup_pant" disabled="true">
+						</div>						
+					</div>
+					<div class="row">
+						{# FECHA #}
+						<div class="col-3 mt-2 col-label">
+							<label class="lblPresup" for="fecha">Fecha</label>
+						</div>
+						<div class="col-6 mt-2">
+						    <input type="date" class="form-control form-control-sm" id="fecha" name="fecha">
+						</div>
+					</div>
+
+					<hr class="mt-4" />
+
+					<div class="row">
+						{# COMPROBANTE (Estado) #}
+						<div class="col-3 mt-2 col-label">
+							<label class="lblPresup" for="idTipoComprobante">Tipo Comp.</label>
+						</div>		
+						<div class="col-8 mt-2">
+							<select class="form-control form-control-sm font-weight-bold" id="idTipoComprobante" name="idTipoComprobante">
+								{% for tipo in tiposCompr %}
+									<option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="row">
+						{# ESTADO (Estado) #}
+						<div class="col-3 mt-2 col-label">
+							<label class="lblPresup" for="estado">Estado</label>
+						</div>		
+						<div class="col-8 mt-2">
+							<select class="form-control form-control-sm" id="estado" name="estado">
+								{% for estado in estadosCompr %}
+									<option value="{{ estado.id }}">{{ estado.descripcion }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col mt-1 mb-0">
+							<div class="accordion" id="accordionFechas">
+								<div class="card ml-2 mr-3 cardOtrasFechas" style="border: none;">
+									<div class="card-header mb-0" id="otrasFechas" style="background: #faf4ee; border: none;">
+											<button type="button" class="btn btn-link btn-sm" data-toggle="collapse" data-target="#collapseOtrasFechas" aria-expanded="true" aria-controls="collapseOtrasFechas">Fechas Modificado, Anulado</button>
+									</div>
+
+									<div id="collapseOtrasFechas" class="collapse" aria-labelledby="otrasFechas" data-parent="#accordionFechas">
+						      			<div class="card-body pt-0" style="background: #faf4ee;">
+											<div class="row mb-0">
+												{# FECHA ULTIMA MODIFICACION #}
+												<div class="col-4 mt-1 col-label">
+													<label class="lblPresup" for="fechaUltModif">Modificado</label>
+												</div>
+												<div class="col-8 mt-1">
+												    <input type="date" class="form-control form-control-sm" id="fechaUltModif" name="fechaUltModif" disabled>
+												</div>
+											</div>
+											<div class="row">
+												{# FECHA ANULACION #}
+												<div class="col-4 mt-2 col-label">
+													<label class="lblPresup" for="fechaAnulac">Anulado</label>
+												</div>
+												<div class="col-8 mt-2">
+												    <input type="date" class="form-control form-control-sm" id="fechaAnulac" name="fechaAnulac" disabled>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								</div>		{# /card #}
+							</div>
+						</div>
+					</div>
+
+					<hr class="mt-1 mb-1"/>
+
+					<div class="row">
+						{# NOMBRE #} 	
+						<div class="col-10 offset-1 mt-1">
+							<div class="input-group input-group-sm mt-2">
+		    					<input id="nombre" name="nombre" class="form-control form-control-sm font-weight-bold" type="text" autocomplete="off" spellcheck="false" placeholder="APELLIDO Nombre">
+								<div class="input-group-append input-group-sm">
+									<button class="btn btn-sm btn-primary" type="button" id="btnBuscarCli" data-toggle="tooltip" data-placement="top" title="Buscar cliente">Buscar</button>
+								</div>
+							</div>
+		    			</div>
+					</div>
+					<div class="row">
+						{# DOMICILIO #} 	
+						<div class="col-10 offset-1 mt-2">
+		    				<input id="domicilio" name="domicilio" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Domicilio">
+		    			</div>
+					</div>
+
+					<div class="collapse" id="collapseMoreData">
+						<div class="row">
+							{# LOCALIDAD #} 	
+							<div class="col-10 offset-1 mt-2">
+			    				<input id="localidad" name="localidad" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Localidad">
+			    			</div>
+						</div>
+						<div class="row">
+							{# PROVINCIA #}
+							<div class="col-10 offset-1 mt-2">
+								<select class="form-control form-control-sm" id="provincia" name="provincia">
+									{% for prov in provincias %}
+										<option value="{{ prov.nombre }}">{{ prov.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							{# PAIS #}
+							<div class="col-10 offset-1 mt-2">
+								<select class="form-control form-control-sm" id="pais" name="pais">
+										<option value="1">Argentina</option>
+										<option value="2">Uruguay</option>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							{# CODIGO POSTAL #}
+							<div class="col-10 offset-1 mt-2">
+		    					<input id="codPostal" name="codPostal" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cod. Postal">
+							</div>
+						</div>
+						<div class="row">
+							{# TELEFONO #}
+							<div class="col-10 offset-1 mt-2">
+		    					<input id="telefono" name="telefono" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Teléfono">
+							</div>
+						</div>
+						<div class="row">
+							{# CELULAR #}
+							<div class="col-10 offset-1 mt-2">
+		    					<input id="celular" name="celular" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Celular">
+							</div>
+						</div>
+						<div class="row">
+							{# CUIT / DNI #}
+							<div class="col-10 offset-1 mt-2">
+		    					<input id="cuitdni" name="cuitdni" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cuit/DNI">
+							</div>
+						</div>
+						<div class="row">
+							{# CONTACTO #} 	
+							<div class="col-10 offset-1 mt-2">
+			    				<input id="contacto" name="contacto" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Contacto">
+			    			</div>
+
+							{# E-MAIL #}
+							<div class="col-10 offset-1 mt-2">
+		    					<input id="email" name="email" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="E-mail">
+							</div>
+						</div>
+					</div>  {# /end collapse #}
+
+					<div class="row">
+						{# DOMICILIO #} 	
+						<div class="col-10 offset-1 mt-1">
+		    				<button id="btnMasDatos" class="btn btn-warning btn-sm mt-1" type="button" data-toggle="collapse" data-target="#collapseMoreData" aria-expanded="false" aria-controls="collapseMoreData">Más Datos...</button>
+		    			</div>
+		    		</div>
+
+				</form>
+
+				<div class="row">
+					<div class="col">
+						<hr>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col ml-2 mr-2">
+						{# COLLAPSE DE TIPOS DE COMPROBANTE #}
+
+						<div class="accordion" id="acordionTipoComprobante">
+							<div class="card">
+								<div class="card-header" id="registroVisita">
+									<button class="btn btn-sm btn-primary dropdown-toggle collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" id="btnCollapseRegistro">
+										Registro de Visitas
+									</button>
+
+								</div>
+
+								<div id="collapseOne" class="collapse" aria-labelledby="registroVisita" data-parent="#acordionTipoComprobante">
+									<div class="card-body">
+
+										{% include 'presupuesto/tab_registro_mobile.twig' %}
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header" id="headingTwo">
+									<button class="btn btn-sm btn-primary dropdown-toggle collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" id="btnCollapsePresup">
+										Presupuesto
+						        	</button>
+								</div>
+								<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#acordionTipoComprobante">
+									<div class="card-body">
+
+										{% include 'presupuesto/tab_presupuesto_mobile.twig' %}
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header" id="headingThree">
+									<button class="btn btn-sm btn-primary dropdown-toggle collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" id="btnCollapseOrden">
+										Orden de Trabajo
+						        	</button>
+								</div>
+								<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#acordionTipoComprobante">
+									<div class="card-body">
+
+										{% include 'presupuesto/tab_orden_mobile.twig' %}
+									</div>
+								</div>
+							</div>
+							<div class="card">
+								<div class="card-header" id="headingFour">
+									<button class="btn btn-sm btn-primary dropdown-toggle collapsed" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour" id="btnCollapseFotos">
+										Ingreso Fotos
+						        	</button>
+								</div>
+								<div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#acordionTipoComprobante">
+									<div class="card-body">
+
+										{% include 'presupuesto/tab_fotos_mobile.twig' %}
+									</div>
+								</div>
+							</div>
+						</div> 		{# /end acordion #}
+
+
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<hr>
+					</div>
+				</div>
+
+				<div class="row">
+					{# OBSERVACIONES GENERALES #}
+					<div class="col m-1">
+						<label class="lblPresup" for="observGenerales">Observaciones Generales</label>
+						<textarea class="form-control" id="observGenerales" name="observGenerales" rows="2"></textarea>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col mt-2">
+						<hr>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-8 mb-3">
+			  			<button id="btnConfirma" class="btn btn-primary btn-sm ml-2">Confirmar</button>
+			  			<a id="btnCancela" class="btn btn-secondary btn-sm ml-3" href="{{ path_for('presupuesto') }}" role="button">Cancelar</a>
+			  			<button id="btnImprime" class="btn btn-success btn-sm ml-3" disabled="true">Generar PDF</button>
+			  		</div>
+
+					<div class="col-4">
+						{% include 'partes/spinnerGuardar.twig' %}
+					</div>
+				</div>
+
+			</div> {# end col id='cliente' #} 
+		</div>   {# /row container #}
+	</div>    {# /container #}
+
+	{% include 'presupuesto/modal_ver_foto.twig' %}
+	{% include 'presupuesto/modal_ingreso_prod.twig' %}
+
+{% endblock %}
+
+{% block javascript %}
+	{{ parent() }}
+
+	<script src="{{ base_url() }}/js/jquery.inputmask.bundle.min.js"></script>
+	<script src="{{ base_url() }}/js/toastr.min.js"></script>
+
+	<script src="{{ base_url() }}/js-app/common.js"></script>
+
+    <script type="text/javascript">
+    	// Paths
+    	var PRESUP = {
+    	    pathGuardar:      "{{ path_for('presupuesto.guardar') }}",
+    	    pathPresup:       "{{ path_for('presupuesto') }}",
+    	    pathPresupBuscar: "{{ path_for('presupuesto.buscar') }}",
+    	    pathGetPresup:    "{{ path_for('presupuesto.getpresup') }}",
+    	    pathImprimir:     "{{ path_for('presupuesto.imprimir') }}",
+    	    pathBuscarCliente: "{{ path_for('cliente.buscar') }}",
+    	    pathGetCliente:   "{{ path_for('cliente.getcliente') }}",
+    	    pathGuardarFoto:  "{{ path_for('presupuesto.guardarfoto') }}",
+    	    fecha:            "{{ fecha }}",
+    	    id_presup:        "{{ id_presup }}",
+    	    listaDeFotos:     [],
+    	    productos: [],
+    	    isMobile: "{{ isMobile }}", //.toLowerCase() == 'true' ? true : false, 
+    	};
+
+		let obj = {};
+		{% for prod in productos %}
+			obj.id = "{{ prod.id }}";
+			obj.descripcion = "{{ prod.descripcion }}";
+			obj.idTipoProd  = "{{ prod.id_TipoProducto }}";
+			obj.ancho = parseFloat( "{{ prod.ancho }}" ) || 0;
+			obj.alto = parseFloat( "{{ prod.alto }}" ) || 0;
+			PRESUP.productos.push( obj );
+			obj = {};
+		{% endfor %}
+
+
+	</script>
+
+	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.1.0"></script>
+{% endblock %}

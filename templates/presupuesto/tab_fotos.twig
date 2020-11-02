@@ -1,0 +1,46 @@
+<div class="marco-tabs">
+
+	<div class="row">
+		<div class="col-sm-8 offset-sm-1 mt-4">
+			<form action="{{ path_for('presupuesto.guardarfoto') }}" method="POST" enctype="multipart/form-data" id="form_foto">
+				{# Para CSRF control #}
+				{{ csrf.field | raw }}
+				<input type="hidden" name="idPresup" id="idPresup" value="0">
+				<div class="custom-file lang="es"">
+					<input type="file" class="form-control form-control-sm custom-file-input" id="inputFoto" name="inputFoto" lang="es">
+					<label class="custom-file-label lblPresup" for="inputFoto">Seleccionar Archivo</label>
+				</div>
+				<button id="btnAgregarFoto" type="submit" class="btn btn-sm btn-success mt-1" disabled>Agregar Foto</button>
+			</form>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col ml-4 mr-4 mt-0">
+			<hr class="mt-2" />
+		</div>
+	</div>
+
+	<div class="row pl-4 pr-4" id="fotosContainer">
+
+{#
+		<div class="col-2  thumbnail-image-container img-fluid">
+			<img class="img-thumbnail w-80" src="{{ base_url() }}/img/trabajo1.jpg" alt="img1">
+		</div>
+		<div class="col-2 thumbnail-image-container img-fluid">
+			<img class="img-thumbnail w-80" src="{{ base_url() }}/img/trabajo2.jpg" alt="img2">
+		</div>
+		<div class="col-2 thumbnail-image-container img-fluid">
+			<img class="img-thumbnail w-80" src="{{ base_url() }}/img/trabajo3.jpg" alt="img3">
+		</div>
+#}
+
+	</div>	
+
+	<div class="row">
+		<div class="col">
+			<br>
+		</div>
+	</div>
+
+</div>

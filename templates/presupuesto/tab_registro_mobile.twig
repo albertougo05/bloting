@@ -1,0 +1,41 @@
+<div class="row">
+	{# REALIZADO POR #}
+	<div class="col-4 mt-4 col-label">
+		<label class="lblPresup" for="empleadoHaceRegistro">Realizado por</label> 
+	</div>
+	<div class="col-8 mt-4">
+		<select class="form-control form-control-sm" id="empleadoHaceRegistro" name="empleadoHaceRegistro">
+			<option value="0">Seleccione empleado...</option>
+			{% for empl in empleados %}
+				<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+
+<div class="row">
+	{# DETALLE REGISTRO #}
+	<div class="col mt-2 mr-3 col-label d-flex flex-column">
+		<label class="lblPresup" for="detalleRegistro">Detalle visita</label> 
+		<textarea class="form-control" id="detalleRegistro" name="detalleRegistro" rows="3"></textarea>
+	</div>
+</div>
+
+<div class="row">
+	{# FECHA TENTATIVA VISITA #}
+	<div class="col-5 mt-3 col-label">
+		<label class="lblPresup" for="fechaTentativa">Fecha Tentativa Visita</label>
+	</div>
+	<div class="col-7 mt-3">
+	    <input type="date" class="form-control form-control-sm text-right" id="fechaTentativa" name="fechaTentativa">
+	</div>
+</div>
+<div class="row">
+	{# FECHA VISITA #}
+	<div class="col-5 mt-1 col-label">
+		<label class="lblPresup" for="fechaVisita">Fecha Visita</label>
+	</div>
+	<div class="col-7 mt-1">
+	    <input type="date" class="form-control form-control-sm text-right" id="fechaVisita" name="fechaVisita">
+	</div>
+</div>

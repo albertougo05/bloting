@@ -1,0 +1,108 @@
+#progressBar {
+	background-color: #3E6FAD;
+	width: 0px;
+	height: 30px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	-moz-transition: .25s ease-out;
+	-webkit-transition: .25s ease-out;
+	-o-transition: .25s ease-out;
+	transition: .25s ease-out;
+}
+.custom-file-input ~ .custom-file-label::after {
+	content: "Elegir";
+}
+.lblPresup {
+	padding-top: 4px !important;
+	margin-bottom: 2px !important;
+	margin-right: 12px !important;
+	font-size: 14px !important;
+}
+#btnConfirma, #btnCancela, #btnImprime { 
+	width: 100px;
+}
+#btnAgregarItem {
+	width: 120px;
+}
+
+@media (max-width: 576px) {
+	.lblPresup {
+  		padding-top: 4px !important;
+  		margin-bottom: 2px !important;
+		margin-right: 10px !important;
+		font-size: 14px !important;
+		float: left !important;
+	}
+}
+#scrollUp {
+    background-image: url("../img/arrow_up_blue_white.png");
+    bottom: 20px;
+    right: 20px;
+    width: 48px;    /* Width of image */
+    height: 48px;   /* Height of image */
+    cursor: pointer;
+    position: fixed;
+    display: none;
+    transition: 0.6s;
+}
+#scrollUp:hover {
+    bottom: 25px;
+}
+a.btn-pills, textarea {
+	font-size: 14px !important;
+}
+div.marco-tabs {
+	margin-top: 0px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #DBD9D8;
+	background: #F8F9FA;
+}
+.col-label {
+	display: flex;
+	justify-content: flex-end;
+	padding-right: 0px;
+	margin-right: 0px;
+}
+table {
+	font-size: 12px !important;
+}
+.head2, thead.headTabModal  {
+	/*background: #E5E7E9;*/
+	background: #515A5A;
+	color: white; 
+}
+.cell-right {
+	text-align: right;
+}
+img.img-thumbnail:hover {
+	opacity: 0.60;
+	width: 105%;
+	cursor: pointer;
+}
+/*thead.headTabModal {
+	background: #E5E7E9;
+}*/
+table#tableModal {
+	font-size: 12px !important;
+}
+.p-modal {
+	font-size: 14px !important;
+}
+.modal-content {
+	background-color: #FFF0F5;
+}
+div#rowOtrasFechas {
+	display: none;
+}
+div.masDatosClie {
+	display: none;
+}
+.concepto {
+	background: #ebf5fb; 
+	/* #d6eaf8*/
+}

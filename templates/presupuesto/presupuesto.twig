@@ -1,0 +1,359 @@
+{% extends 'base.twig' %}
+
+{% block head %}
+	{{ parent() }}
+
+	<link rel="stylesheet" href="{{ base_url() }}/css/toastr.min.css">
+	<link rel="stylesheet" href="{{ base_url() }}/css/jquery-confirm.min.css">
+	<link rel="stylesheet" href="{{ base_url() }}/css/all.css">
+	<link rel="stylesheet" href="{{ base_url() }}/css/presupuesto.css">
+
+{% endblock %}
+
+{% block title %} {{ titulo }} {% endblock %} 
+
+{% block navigation %}
+	{% include 'clientes/nav_cliente.twig' %}
+{% endblock %}
+
+{% block content %}
+	<div class="container mt-4">
+		<div class="row justify-content-center">
+			<div class="col-sm-12" id="fondoComun">
+
+				<h2 class="text-right pr-4 font-weight-bold pr-4">Presupuesto</h2>
+				<hr class="mt-3 mb-1" />
+
+				{# FORMULARIO #}
+				<form id="formPresup">
+					{# Para CSRF control #}
+					{{ csrf.field | raw }}
+
+					<input type="hidden" name="id_presup" id="id_presup">
+					<input type="hidden" name="id_cliente" id="id_cliente" value="0">
+
+					<div class="row">
+						{# SUCURSAL #}
+						<div class="col-sm-1 offset-sm-1 mt-3 col-label">
+							<label class="lblPresup" for="sucursal">Sucursal</label>
+						</div>		
+						<div class="col-sm-3 mt-3">
+							<select class="form-control form-control-sm" id="sucursal" name="sucursal">
+								{% for suc in sucursales %}
+									<option value="{{ suc.id }}">{{ suc.localidad }} ({{ suc.nroSucursal }})</option>
+								{% endfor %}
+							</select>
+						</div>
+						{# FECHA #}
+						<div class="col-sm-1 mt-3 col-label">
+							<label class="lblPresup" for="fecha">Fecha</label>
+						</div>
+						<div class="col-sm-3 mt-3">
+						    <input type="date" class="form-control form-control-sm" id="fecha" name="fecha">
+						</div>
+						{# ID PRESUPUESTO #}
+						<div class="col-sm-1 mt-3 col-label">
+							<label class="lblPresup" for="id_presup_pant">ID</label>			
+						</div>
+						<div class="col-sm-1 mt-3">
+							<input type="text" class="form-control form-control-sm text-right" id="id_presup_pant" name="id_presup_pant" disabled="true">
+						</div>
+
+					</div>
+
+					<hr class="mt-3 mb-1" />
+
+					<div class="row">
+						{# COMPROBANTE (Estado) #}
+						<div class="col-sm-1 offset-sm-1 mt-2 col-label">
+							<label class="lblPresup" for="idTipoComprobante">Comprobante</label>
+						</div>		
+						<div class="col-sm-3 mt-2">
+							<select class="form-control form-control-sm font-weight-bold" id="idTipoComprobante" name="idTipoComprobante">
+								{% for tipo in tiposCompr %}
+									<option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+								{% endfor %}
+							</select>
+						</div>
+						{# ESTADO (Estado) #}
+						<div class="col-sm-1 offset-md-2 mt-2 col-label">
+							<label class="lblPresup" for="estado">Estado</label>
+						</div>		
+						<div class="col-sm-3 mt-2">
+							<select class="form-control form-control-sm" id="estado" name="estado">
+								{% for estado in estadosCompr %}
+									<option value="{{ estado.id }}">{{ estado.descripcion }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+
+					<div class="row" id="rowOtrasFechas">
+						<div class="d-flex">
+							{# FECHA ULTIMA MODIFICACION #}
+							<div class="col-sm-2 mt-2 col-label">
+								<label class="lblPresup" for="fechaUltModif">Modificado</label>
+							</div>
+							<div class="col-sm-3 mt-2">
+							    <input type="date" class="form-control form-control-sm" id="fechaUltModif" name="fechaUltModif" disabled>
+							</div>
+
+							{# FECHA ANULACION #}
+							<div class="col-sm-3 mt-2 col-label">
+								<label class="lblPresup" for="fechaAnulac">Anulado</label>
+							</div>
+							<div class="col-sm-3 mt-2">
+							    <input type="date" class="form-control form-control-sm" id="fechaAnulac" name="fechaAnulac" disabled>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-6 offset-2 pl-1 mt-2 mb-0">
+							<button type="button" class="btn btn-link btn-sm" id="btnOtrasFechas">Fechas Modificado, Anulado</button>
+						</div>
+					</div>
+
+					<hr class="mt-3 mb-1" />
+
+					<div class="row">
+						{# NOMBRE #} 	
+						<div class="col-sm-1 offset-sm-1 mt-2 col-label">
+							<label class="lblPresup" for="nombre">Nombre</label>
+						</div>					
+						<div class="col-sm-4">
+							<div class="input-group input-group-sm mt-2">
+		    					<input id="nombre" name="nombre" class="form-control form-control-sm font-weight-bold" type="text" autocomplete="off" spellcheck="false" placeholder="APELLIDO Nombre">
+								<div class="input-group-append input-group-sm">
+									<button class="btn btn-sm btn-primary" type="button" id="btnBuscarCli" data-toggle="tooltip" data-placement="top" title="Buscar cliente">Buscar</button>
+								</div>
+							</div>
+		    			</div>
+						{# DOMICILIO #} 	
+						<div class="col-sm-1 mt-2 col-label">
+							<label class="lblPresup" for="domicilio">Domicilio</label>
+						</div>					
+						<div class="col-sm-4 mt-2">
+		    				<input id="domicilio" name="domicilio" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false">
+		    			</div>
+		    		</div>
+
+		    		<div class="masDatosClie">
+						<div class="row">
+							{# LOCALIDAD #} 	
+							<div class="col-sm-1 offset-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="localidad">Localidad</label>
+							</div>					
+							<div class="col-sm-3 mt-2">
+			    				<input id="localidad" name="localidad" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false">
+			    			</div>						
+							{# PROVINCIA #}
+							<div class="col-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="provincia">Provincia</label>			
+							</div>
+							<div class="col-sm-2 mt-2">
+								<select class="form-control form-control-sm" id="provincia" name="provincia">
+									{% for prov in provincias %}
+										<option value="{{ prov.nombre }}">{{ prov.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
+							{# PAIS #}
+							<div class="col-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="PAIS">País</label>			
+							</div>
+							<div class="col-sm-2 mt-2">
+								<select class="form-control form-control-sm" id="pais" name="pais">
+										<option value="1">Argentina</option>
+										<option value="2">Uruguay</option>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							{# CODIGO POSTAL #}
+							<div class="col-sm-1 offset-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="codPostal">Cod. Postal</label>			
+							</div>
+							<div class="col-sm-1 mt-2">
+		    					<input id="codPostal" name="codPostal" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cod. Postal">
+							</div>
+							{# CUIT / DNI #}
+							<div class="col-sm-2 mt-2">
+		    					<input id="cuitdni" name="cuitdni" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cuit/DNI">
+							</div>
+							{# TELEFONO #}
+							<div class="col-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="telefono col-label">Teléfono</label>
+							</div>							
+							<div class="col-sm-2 mt-2">
+		    					<input id="telefono" name="telefono" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false">
+							</div>
+							{# CELULAR #}
+							<div class="col-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="celular">Celular</label>
+							</div>							
+							<div class="col-sm-2 mt-2">
+		    					<input id="celular" name="celular" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false">
+							</div>
+						</div>
+						<div class="row">
+							{# CONTACTO #} 	
+							<div class="col-sm-1 offset-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="contacto">Contacto</label>
+							</div>					
+							<div class="col-sm-4 mt-2">
+			    				<input id="contacto" name="contacto" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false">
+			    			</div>
+
+							{# E-MAIL #}
+							<div class="col-sm-1 mt-2 col-label">
+								<label class="lblPresup" for="email">E-Mail</label>
+							</div>
+							<div class="col-sm-4 mt-2">
+		    					<input id="email" name="email" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false">
+							</div>
+						</div>
+					</div>
+
+		    		<div class="row">
+		    			<div class="col-6 offset-2 pl-1 mt-2 mb-0">
+							<button type="button" class="btn btn-link btn-sm" id="btnMasDatosClie">Más datos cliente...</button>
+						</div>
+		    		</div>
+
+				</form>  {# /form #}
+
+				<div class="row">
+					<div class="col">
+						<hr>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col ml-4 mr-4">
+						{# ETIQUETAS TIPO DE COMPROBANTE #}
+						<ul class="nav nav-pills mb-0" id="pills-tab" role="tablist">
+							<li class="nav-item">
+		    					<a class="nav-link btn-pills active" id="pills-registro-tab" data-toggle="pill" href="#pills-registro" role="tab" aria-controls="pills-registro" aria-selected="true">Registro Visita</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link btn-pills" id="pills-presupuesto-tab" data-toggle="pill" href="#pills-presupuesto" role="tab" aria-controls="pills-presupuesto" aria-selected="false">Presupuesto</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link btn-pills" id="pills-orden-tab" data-toggle="pill" href="#pills-orden" role="tab" aria-controls="pills-orden" aria-selected="false">Orden de Trabajo</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link btn-pills" id="pills-fotos-tab" data-toggle="pill" href="#pills-fotos" role="tab" aria-controls="pills-fotos" aria-selected="false">Ingreso Fotos</a>
+							</li>
+						</ul>
+						<div class="tab-content" id="pills-tabContent">
+							<div class="tab-pane fade show active" id="pills-registro" role="tabpanel" aria-labelledby="pills-registro-tab">
+
+								{% include 'presupuesto/tab_registro.twig' %}							
+
+							</div>
+							<div class="tab-pane fade" id="pills-presupuesto" role="tabpanel" aria-labelledby="pills-presupuesto-tab">
+
+								{% include 'presupuesto/tab_presupuesto.twig' %}
+
+							</div>
+							<div class="tab-pane fade" id="pills-orden" role="tabpanel" aria-labelledby="pills-orden-tab">
+
+								{% include 'presupuesto/tab_orden.twig' %}
+
+							</div>
+							<div class="tab-pane fade" id="pills-fotos" role="tabpanel" aria-labelledby="pills-fotos-tab">
+
+								{% include 'presupuesto/tab_fotos.twig' %}
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<hr>
+					</div>
+				</div>
+
+				<div class="row">
+					{# OBSERVACIONES GENERALES #}
+					<div class="col-sm-2 offste-sm-1 col-label">
+						<label class="lblPresup" for="observaciones">Observaciones Generales</label>
+					</div>
+					<div class="col-sm-9">
+						<textarea class="form-control" id="observaciones" name="observaciones" rows="2"></textarea>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col mt-2">
+						<hr>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-6">
+			  			<button id="btnConfirma" class="btn btn-primary btn-sm ml-4">Confirmar</button>
+			  			<a id="btnCancela" class="btn btn-secondary btn-sm ml-3" href="{{ path_for('presupuesto') }}" role="button">Cancelar</a>
+			  			<button id="btnImprime" class="btn btn-success btn-sm ml-3" disabled="true">Imprimir</button>
+			  		</div>
+
+					<div class="col-4">
+						{% include 'partes/spinnerGuardar.twig' %}
+					</div>
+				</div>
+
+			</div> {# end col id='cliente' #} 
+		</div>   {# /row container #}
+	</div>    {# /container #}
+
+	{# VENTANAS MODALES #}
+
+	{% include 'presupuesto/modal_ver_foto.twig' %}
+	{% include 'presupuesto/modal_ingreso_prod.twig' %}
+
+{% endblock %}
+
+{% block javascript %}
+	{{ parent() }}
+
+
+	<script src="{{ base_url() }}/js/jquery.inputmask.bundle.min.js"></script>
+	<script src="{{ base_url() }}/js/toastr.min.js"></script>
+	<script src="{{ base_url() }}/js/jquery-confirm.min.js"></script>
+	<script src="{{ base_url() }}/js-app/common.js"></script>
+
+    <script type="text/javascript">
+    	// Paths
+    	var PRESUP = {
+    	    pathGuardar:      "{{ path_for('presupuesto.guardar') }}",
+    	    pathPresup:       "{{ path_for('presupuesto') }}",
+    	    pathPresupBuscar: "{{ path_for('presupuesto.buscar') }}",
+    	    pathGetPresup:    "{{ path_for('presupuesto.getpresup') }}",
+    	    pathImprimir:     "{{ path_for('presupuesto.imprimir') }}",
+    	    pathBuscarCliente: "{{ path_for('cliente.buscar') }}",
+    	    pathGetCliente:   "{{ path_for('cliente.getcliente') }}",
+    	    pathGuardarFoto:  "{{ path_for('presupuesto.guardarfoto') }}",
+    	    fecha:            "{{ fecha }}",
+    	    id_presup:        "{{ id_presup }}",
+    	    listaDeFotos:     [],
+    	    productos: []
+    	};
+
+		let obj = {};
+		{% for prod in productos %}
+			obj.id = "{{ prod.id }}";
+			obj.descripcion = "{{ prod.descripcion }}";
+			obj.idTipoProd  = "{{ prod.id_TipoProducto }}";
+			obj.ancho = parseFloat( "{{ prod.ancho }}" ) || 0;
+			obj.alto = parseFloat( "{{ prod.alto }}" ) || 0;
+			PRESUP.productos.push( obj );
+			obj = {};
+		{% endfor %}
+
+	</script>
+
+	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.0.9"></script>
+{% endblock %}

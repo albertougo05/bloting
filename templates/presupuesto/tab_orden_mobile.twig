@@ -1,0 +1,41 @@
+	<div class="row">
+		{# FECHA TENTATIVA TRABAJO #}
+		<div class="col-5 mt-2 col-label">
+			<label class="lblPresup" for="fechaTentaTrabajo">Fecha Tentativa O.T.</label>
+		</div>
+		<div class="col-7 mt-2">
+		    <input type="date" class="form-control form-control-sm" id="fechaTentaTrabajo" name="fechaTentaTrabajo">
+		</div>
+	</div>
+	<div class="row">
+		{# FECHA EJECUCION #}
+		<div class="col-5 mt-2 col-label">
+			<label class="lblPresup" for="fechEjecucionOT">Fecha Ejecución</label>
+		</div>
+		<div class="col-7 mt-2">
+		    <input type="date" class="form-control form-control-sm" id="fechaEjecucionOT name="fechaEjecucionOT>
+		</div>
+	</div>
+
+	<div class="row">
+		{# DETALLE ORDEN DE TRABAJO #}
+		<div class="col mt-2">
+			<label class="lblPresup" for="detalleOrdenTrabajo">Detalle Orden Trabajo</label>
+			<textarea class="form-control" id="detalleOrdenTrabajo" name="detalleOrdenTrabajo" rows="4"></textarea>
+		</div>
+	</div>
+
+	<div class="row">
+		{# REALIZADO POR #}
+		<div class="col-4 mt-3 col-label">
+			<label class="lblPresup" for="emplRealizaOrdTrab">Realizado por</label> 
+		</div>
+		<div class="col-8 mt-3">
+			<select class="form-control form-control-sm" id="emplRealizaOrdTrab" name="emplRealizaOrdTrab">
+				<option value="0">Seleccione empleado...</option>
+				{% for empl in empleados %}
+					<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>

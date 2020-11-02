@@ -1,0 +1,158 @@
+<!-- Modal -->
+<div class="modal fade" id="modIngresoProd" tabindex="-1" role="dialog" aria-labelledby="tituloModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-bolder" id="tituloModal">Ingreso Producto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col">
+              <p class="p-modal ml-2 mb-1">Seleccione Producto y Tipo:</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-5 ml-2 mt-0">
+              <select name="selTipoProd" id="selTipoProd" class="form-control form-control-sm">
+                {% for tipo in tiposprod %}
+                  <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col"></div>
+            <div class="col-5 mr-2 mt-0">
+              <select name="selProductos" id="selProductos" class="form-control form-control-sm">
+                <option value=0>Selecione tipo</option>
+                {% for prod in productos %}
+                  {% if prod.id_TipoProducto == 1 %}
+                    <option value="{{ prod.id }}">{{ prod.descripcion }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div> {# /row #}
+
+          <div class="row">
+            <div class="col-4 ml-2 mt-3">
+              <p class="p-modal">Medidas placas:</p>
+            </div>
+            <div class="col mt-3">
+              <input type="text" class="form-control form-control-sm text-right" id="placaMedidaAncho" name="placaMedidaAncho" placeholder="Ancho" disabled>
+            </div>
+            <div class="col mt-3 mr-2">
+              <input type="text" class="form-control form-control-sm text-right" id="placaMedidaAlto" name="placaMedidaAlto" placeholder="Alto" disabled>
+            </div>
+          </div> {# /row #}
+
+          <div class="row">
+            <div class="col-4 ml-2 mt-2">
+              <p class="p-modal">Concepto trabajo:</p>
+            </div>
+            <div class="col ml-0 mr-2 mt-2">
+              <input type="text" class="form-control form-control-sm" id="conceptoTrabajo">
+            </div>
+          </div> {# /row #}
+
+          {% if isMobile %}
+            <div class="row mb-0">
+              <div class="col mt-0 mb-0 ml-2">
+                <p class="p-modal">Medidas del trabajo:</p>
+              </div>
+            </div>  {# /row #}
+            <div class="row mb-3">
+              <div class="col mt-0 ml-2">
+                <label for="anchoTrabajo" class="p-modal mb-0 float-right">Ancho</label>
+                <input type="text" class="form-control form-control-sm text-right" id="anchoTrabajo" name="anchoTrabajo">
+              </div>
+              <div class="col mt-0">
+                <label for="altoTrabajo" class="p-modal mb-0 float-right">Alto</label>
+                <input type="text" class="form-control form-control-sm text-right" id="altoTrabajo" name="altoTrabajo">
+              </div>
+              <div class="col mt-0">
+                <label for="mts2Trabajo" class="p-modal mb-0 float-right">Mts/Mts2.</label>
+                <input type="text" class="form-control form-control-sm text-right" id="mts2Trabajo" name="mts2Trabajo" disabled>
+              </div>
+              <div class="col mr-2" style="padding-top: 20px;">
+                <button id="btnCalculaModal" type="button" class="btn btn-sm btn-warning float-right">Calcular</button>
+              </div>
+            </div> {# /row #}
+
+          {% else %}
+
+            <div class="row mt-1">
+              <div class="col-2 ml-2">
+                <p class="p-modal mt-2">Medidas trabajo:</p>
+              </div>
+                <div class="col">
+                  <label for="anchoTrabajo" class="p-modal mt-1 mb-0 float-right">Ancho</label>
+                  <input type="text" class="form-control form-control-sm text-right" id="anchoTrabajo" name="anchoTrabajo">
+                </div>
+                <div class="col">
+                  <label for="altoTrabajo" class="p-modal mt-1 mb-0 float-right">Alto</label>
+                  <input type="text" class="form-control form-control-sm text-right" id="altoTrabajo" name="altoTrabajo">
+                </div>
+                <div class="col">
+                  <label for="mts2Trabajo" class="p-modal mt-1 mb-0 float-right">Mts/Mts2.</label>
+                  <input type="text" class="form-control form-control-sm text-right" id="mts2Trabajo" name="mts2Trabajo" disabled>
+                </div>
+                <div class="col mr-2 pt-4">
+                  <button id="btnCalculaModal" type="button" class="btn btn-sm btn-warning">Calcular</button>
+                </div>
+            </div> {# /row #}
+
+          {% endif %}
+
+          <div class="row">
+            <div class="col ml-2 mr-2">
+              <p class="p-modal mb-1">Cantidad placas sugeridas:</p>
+              <table id="tableModal" class="table table-bordered table-sm mt-0">
+                <thead class="headTabModal">
+                  <tr>
+                    <th scope="col" class="text-right">Ancho</th>
+                    <th scope="col" class="text-right">Alto</th>
+                    <th scope="col" class="text-right">Cant Total</th>
+                    <th scope="col" class="text-right">Cubren Mts/Mts2.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="trTabModal">
+                    <td class="text-right" id="tdCantPlacSugAncho">0</td>
+                    <td class="text-right" id="tdCantPlacSugAlto">0</td>
+                    <td class="text-right" id="tdCantPlacSugCant">0</td>
+                    <td class="text-right" id="tdPlacasCubrenMts2">0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div> {# /row #}   
+
+          <div class="row">
+            <div class="col-3 ml-2">
+              <label class="p-modal" for="selEstado">Estado item</label>
+            </div>
+            <div class="col mr-2">
+              <select name="selEstado" id="selEstado" class="form-control form-control-sm mr-1">
+                {% for estado in estadosItem %}
+                  <option value="{{ estado.id }}">{{ estado.descripcion }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div> {# /row #}
+
+        </div> {# /container-fluid #}
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancela</button>
+        <button id="btnConfirmaModalProds" type="button" class="btn btn-sm btn-primary">Confirma</button>
+      </div>
+
+    </div>
+  </div>
+</div>

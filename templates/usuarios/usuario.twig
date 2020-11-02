@@ -1,0 +1,170 @@
+{% extends 'base.twig' %}
+
+{% block head %}
+	{{ parent() }}
+
+	<link rel="stylesheet" href="{{ base_url() }}/css/typeahead.css">
+	<link rel="stylesheet" href="{{ base_url() }}/css/toastr.min.css">
+
+	<style type="text/css">
+	  label {
+	  	padding-top: 4px !important;
+	  	margin-bottom: 2px !important;
+	  	margin-right: 12px !important;
+	  	font-size: 14px !important;
+	  }
+	  .formulario {
+	  	margin: 0px 40px;
+	  }
+	</style>
+
+{% endblock %}	
+
+{% block title %} {{ titulo }} {% endblock %} 
+
+{% block navigation %}
+	{% include 'usuarios/nav_usuario.twig' %}
+{% endblock %}
+
+{% block breadcrumbs %}
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="{{ path_for('home') }}">Menú</a></li>
+						<li class="breadcrumb-item"><a href="{{ path_for('home') }}">Usuarios</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Usuario</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-1"></div>
+			<div class="col" id="fondoComun">
+
+				<h2 class="text-right pr-4 font-weight-bold pr-4">Usuario</h2>
+				<hr class="mt-3 mb-2">
+
+				<form id="formUser" method="POST" autocomplete="off" novalidate>
+
+					<input type="hidden" id="iduser" name="iduser">
+
+					<div class="formulario">
+					    <div class="form-group">
+					        <label for="usuario">Nombre usuario</label>
+					        <input type="text" class="form-control form-control-sm" id="usuario" name="usuario">
+					    </div>
+					    <div class="form-group">
+					        <label for="contrasena">Contraseña</label>
+					        <input type="password" class="form-control form-control-sm" id="contrasena" name="contrasena">
+					    </div>
+						<div class="form-row">
+							<div class="form-group col">
+						        <label for="confirma">Confirmar contraseña</label>
+						        <input type="password" class="form-control form-control-sm" id="confirma" name="confirma">
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="nivel">Seleccione nivel de acceso</label>
+									<select class="form-control form-control-sm" id="nivel" name="nivel">
+										{% for key, nivel in accesos %}
+											<option value="{{ key }}">{{ nivel }}</option>
+										{% endfor %}							
+									</select>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="estado">Seleccione estado</label>
+									<select class="form-control form-control-sm" id="estado" name="estado">
+										{% for estado in estados %}
+											<option value="{{ estado }}">{{ estado }}</option>
+										{% endfor %}							
+									</select>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col">
+							<hr class="mt-2 mb-4">
+						</div>
+					</div>
+
+					{# Para CSRF control #}
+					{{ csrf.field | raw }}
+
+					<div class="row">
+						<div class="col-4 d-inline-flex">
+				  			<button id="btnConfirma" type="submit" class="btn btn-primary btn-sm">Confirma</button>
+				  			<a id="btnCancela" class="btn btn-secondary btn-sm ml-2" href="{{ path_for('usuario') }}" role="button">Cancela</a>
+				  		</div>
+
+						<div class="col-4">
+							{% include 'partes/spinnerGuardar.twig' %}
+						</div>
+					</div>
+				</form>
+
+			</div> {# end col id='usuaro' #} 
+			<div class="col-1"></div>
+		</div>   {# /row container #}
+	</div>    {# /container #}
+
+	<!-- Modal Buscar Usuario-->
+	<div class="modal fade" id="modalUsers" tabindex="-1" role="dialog" aria-labelledby="modalUsersTitle" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title" id="modalCenterTitle"><strong>Buscar usuario</strong></h4>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        <p>Lista de Usuarios</p>
+
+		<div>
+	        <select id="selectUser" name="selectUser" class="col-sm-6 form-control form-control-sm">
+				{% for user in usuarios %}
+					<option value="{{ user.Id }}">{{ user.Usuario }}</option>
+				{% endfor %}
+			</select>
+			<button type="button" id="btnSelecUser" class="btn btn-primary" style="position: absolute; right: 20px; bottom: 15px;">Selecciona</button>
+		</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+{% endblock %}
+
+{% block javascript %}
+	{{ parent() }}
+
+	<script src="{{ base_url() }}/js/toastr.min.js"></script>
+	<script src="{{ base_url() }}/js-app/common.js"></script>
+
+    <script type="text/javascript">
+    	var USER = {
+    		_pathGuardar: "{{ path_for('usuario.guardar') }}",
+    		_pathUsuario: "{{ path_for('usuario') }}",
+    		_pathExiste:  "{{ path_for('usuario.existe', {'user': ''}) }}",
+    		_pathBuscar:  "{{ path_for('usuario.buscar', {'id': ''}) }}",
+    		_statusEdit: false, // Verdadero si está editando usuario (para evitar control existencia de nombre)
+    	};
+	</script>
+
+	<script type="module" src="{{ base_url() }}/js-app/usuarios/usuario.js?ver=0.0.1"></script>
+{% endblock %}
+
+

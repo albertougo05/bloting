@@ -1,0 +1,83 @@
+/* misEstilos.css - Ramagro */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /*background-color: #74EBD5;
+  background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);*/
+
+  font-size: 18px;
+
+  /* font-family: 'Lato', sans-serif; */
+}
+
+.breadcrumb {
+  background: none !important;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+.dropdown-item:hover { 
+    color: #fff !important;
+    background: #2780E3 !important; 
+}
+.breadcrumb a {
+  /*color: black;*/
+  color: rgba(0, 0, 0, .75);
+}
+.breadcrumb a:hover {
+  /*color: black;*/
+  color: rgba(0, 0, 0, .9);
+}
+.breadcrumb>.active {
+  color: black;
+  font-weight: bold;
+
+} 
+#scrollUp {
+    background-image: url("../img/top.png");
+    bottom: 20px;
+    right: 20px;
+    width: 38px;    /* Width of image */
+    height: 38px;   /* Height of image */
+    cursor: pointer;
+    position: fixed;
+    display: none;
+}
+.tridimLogo {
+    position: absolute;
+    top: 85%;
+    right: 3%;
+/*    animation-name: move-logo;
+    animation-duration: 1s;*/
+}
+
+/*@keyframes move-logo {*/
+  /*from {right: 90%;} to {right: 3%;}*/
+/*  from {top: 10%;} to {top: 85%;}
+}*/
+.inputRight {
+  text-align: right;
+}
+/* Fondo comun a todas las pantallas */
+#fondoComun {
+  background-color: rgba(250,247,246,.97);
+  /*text-align: left;*/
+  border-radius: 3px;
+  margin-top: -5px;
+  padding: 2%;
+  -webkit-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.4);
+  -moz-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.4);
+  box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.4);
+}
+/* Ocultar spinner al inicio */
+#spinnerGuardar {
+  display: none;
+}
+.cellRight {
+  text-align: right;
+}
+textarea#detalle {
+  font-size: 14px !important;
+}

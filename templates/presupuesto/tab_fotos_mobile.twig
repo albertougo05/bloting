@@ -1,0 +1,22 @@
+	<div class="row">
+		<div class="col mt-3">
+			<form action="{{ path_for('presupuesto.guardarfoto') }}" method="POST" enctype="multipart/form-data" id="form_foto">
+				{# Para CSRF control #}
+				{{ csrf.field | raw }}
+				<input type="hidden" name="idPresup" id="idPresup" value="0" />
+				<div class="custom-file lang="es"">
+					<input type="file" class="form-control form-control-sm custom-file-input" id="inputFoto" name="inputFoto" lang="es" />
+					<label class="custom-file-label lblPresup" for="inputFoto">Seleccionar Archivo</label>
+				</div>
+				<button id="btnAgregarFoto" type="submit" class="btn btn-sm btn-success mt-1" disabled>Agregar Foto</button>
+			</form>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col mt-2">
+			<hr  />
+		</div>
+	</div>
+
+	<div class="row p-4" id="fotosContainer"></div>	

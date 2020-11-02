@@ -1,0 +1,84 @@
+#fondoComun {
+	margin-left: 12px;
+	margin-right: 12px;
+}
+.custom-file-input ~ .custom-file-label::after {
+	content: "Elegir";
+}
+.lblPresup {
+	padding-top: 4px !important;
+	margin-bottom: 2px !important;
+	margin-right: 1px !important;
+	font-size: 14px !important;
+}
+/*#btnConfirma, #btnCancela, #btnImprime {
+	width: 80px;
+}*/
+
+#scrollUp {
+    background-image: url("../img/arrow_up_blue_white.png");
+    bottom: 20px;
+    right: 20px;
+    width: 48px;    /* Width of image */
+    height: 48px;   /* Height of image */
+    cursor: pointer;
+    position: fixed;
+    display: none;
+    transition: 0.6s;
+    z-index: 10;
+}
+#scrollUp:hover {
+    bottom: 25px;
+}
+a.btn-pills, textarea {
+	font-size: 14px !important;
+}
+div.marco-tabs {
+	margin-top: 0px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #DBD9D8;
+	background: #F8F9FA;
+}
+.col-label {
+	display: flex;
+	justify-content: flex-end;
+	padding-right: 0px;
+	margin-right: 0px;
+}
+table {
+	font-size: 14px !important;
+}
+.head2, thead.headTabModal  {
+	/*background: #E5E7E9;*/
+	background: #515A5A;
+	color: white; 
+}
+.cell-right {
+	text-align: right;
+}
+img.img-thumbnail:hover {
+	opacity: 0.60;
+	width: 105%;
+	cursor: pointer;
+}
+table#tableModal {
+	font-size: 12px !important;
+}
+.p-modal {
+	font-size: 14px !important;
+}
+.modal-content {
+	background-color: #FFF0F5;
+}
+#btnCollapseRegistro, #btnCollapsePresup, #btnCollapseOrden, #btnCollapseFotos{
+	width: 150px;
+}
+.card-body > p {
+	font-size: 14px !important;
+}
+.cardOtrasFechas {
+	border: none;
+	background: #faf4ee;
+}
+

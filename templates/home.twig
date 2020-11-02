@@ -1,0 +1,75 @@
+{% extends 'base.twig' %}
+
+{% block head %}
+  {{ parent() }}
+
+  <link rel="stylesheet" href="{{ base_url() }}/css/animate.min.css">
+{% endblock %}
+
+{% block title %}{{ titulo }}{% endblock %} 
+
+{% block navigation %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+	  {% include 'partes/nav-brand.twig' %}
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+      <ul class="navbar-nav mr-auto">
+
+        <li class="nav-item active dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Presupuestos</a>
+
+          {# PRESUPUESTO #}
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{{ path_for('presupuesto') }}">Crear presupuesto</a>
+            <a class="dropdown-item" href="#">Informe de presupuestos</a>
+          </div>
+        </li>
+
+        {# CLIENTES #}
+        <li class="nav-item active dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Clientes</a>
+
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{{ path_for('cliente') }}">Datos cliente</a>
+            <a class="dropdown-item" href="#">Informes</a>
+           </div>
+        </li>
+
+        {# USUARIOS (Solo nivel 'admin') #}
+        {% if auth.user.Nivel == 'admin' %}
+          <li class="nav-item active dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Usuarios</a>
+
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+      				<a class="dropdown-item" href="{{ path_for('usuario') }}">Datos</a>
+      				<a class="dropdown-item" href="#">Listados</a>
+             </div>
+          </li>
+        {% endif %}
+
+      </ul>   {# End navbar #}
+
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Usuario:&nbsp;{{ auth.user.Usuario }}</a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{{ path_for('index') }}">Salir</a>
+           </div>
+        </li>
+      </ul>
+
+    </div>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="tridimLogo animate__animated animate__rubberBand">
+    <img src="img/tridimLogo.png" alt="tridimLogo" width="100" height="100">
+  </div>
+{% endblock %}

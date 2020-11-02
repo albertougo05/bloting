@@ -1,0 +1,43 @@
+html, body{
+  margin:0 !important;
+  padding:0 !important;
+}
+#tablaBuscar {
+	margin: 5px 20px;
+	padding-right: 25px;
+	font-size: 80%;
+}
+#tablaBuscar tr:hover {
+	cursor: pointer;
+}
+.filtros label {
+	font-size: 80%;
+	padding-top: 0px;
+}
+.custom-radio {
+	margin-top: 4px!important;
+}
+/* Ocultar primera columna de tabla */
+#tablaBuscar th:nth-of-type(1) {
+  display: none;
+} 
+#tablaBuscar td:nth-of-type(1) {
+  display: none;
+} 
+.lblFecha {
+	padding-top: 3px;
+	margin-right: 10px;
+}
+.cellRight {
+	text-align: right;
+}
+.pFiltros {
+	margin-top: 5px;
+}
+.btn-recargar {
+	height: 30px !important;
+	margin-right: 16px;
+}
+#btnCancel {
+	padding: auto 40px !important;
+}

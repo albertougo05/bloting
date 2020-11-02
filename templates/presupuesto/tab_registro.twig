@@ -1,0 +1,47 @@
+<div class="marco-tabs">
+
+	<div class="row">
+		{# REALIZADO POR #}
+		<div class="col-sm-2 mt-4 col-label">
+			<label class="lblPresup" for="empleadoHaceRegistro">Realizado por</label> 
+		</div>
+		<div class="col-sm-4 mt-4">
+			<select class="form-control form-control-sm" id="empleadoHaceRegistro" name="empleadoHaceRegistro">
+				<option value="0">Seleccione empleado...</option>
+				{% for empl in empleados %}
+					<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	<div class="row">
+		{# DETALLE REGISTRO #}
+		<div class="col-sm-2 mt-2 col-label">
+			<label class="lblPresup" for="detalleRegistro">Detalle visita</label> 
+		</div>
+		<div class="col-sm-9 mt-2">
+			<textarea class="form-control" id="detalleRegistro" name="detalleRegistro" rows="4"></textarea>
+		</div>
+	</div>
+
+	<div class="row">
+		{# FECHA TENTATIVA VISITA #}
+		<div class="col-sm-2 mt-2 col-label">
+			<label class="lblPresup" for="fechaTentativa">Fecha Tentativa Visita</label>
+		</div>
+		<div class="col-sm-3 mt-2">
+		    <input type="date" class="form-control form-control-sm" id="fechaTentativa" name="fechaTentativa">
+		</div>
+		{# FECHA VISITA #}
+		<div class="col-sm-2 offset-sm-1 mt-2 col-label">
+			<label class="lblPresup" for="fechaVisita">Fecha Visita</label>
+		</div>
+		<div class="col-sm-3 mt-2">
+		    <input type="date" class="form-control form-control-sm" id="fechaVisita" name="fechaVisita">
+		</div>
+	</div>
+
+	<br />
+
+</div>

@@ -1,0 +1,29 @@
+
+{# Modal ver imagenes #}
+
+<div class="modal fade" id="verImagen" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="tituloModal" id="exampleModalCenterTitle">title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		{# El src de img lo carga jquery #}
+    {% if isMobile %}
+		  <img id='imgMod' src='' class='img-rounded center-block' alt='mobile' width='384' height='240' />
+    {% else %}
+      <img id='imgMod' src='' class='img-rounded center-block' alt='' width='480' height='300' />
+    {% endif %}
+		{# Medidas de la imagen lo carga jquery #}
+		<p id='pMedidas' class='text-center'></p>
+      </div>
+      <div class="modal-footer">
+		<button id="btnBorrar" type="button" class="btn btn-sm btn-danger">Eliminar</button>      	
+		<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
