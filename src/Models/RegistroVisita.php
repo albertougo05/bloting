@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 
 /**
- * Presupuesto
+ * RegistroVisita
  */
-class Presupuesto extends Model
+class RegistroVisita extends Model
 {
 	// Nombre de la tabla
-	protected $table = 'blo_Presupuestos';
+	protected $table = 'blo_RegistroVisitas';
 
 	// Lista de campos modificables:
 

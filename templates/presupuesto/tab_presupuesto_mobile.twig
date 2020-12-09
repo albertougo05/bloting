@@ -1,101 +1,84 @@
-	<div class="row">
-		{# FECHA PRESUPUESTO #}
-		<div class="col-6 mt-0">
-			<label class="lblPresup" for="fechaPresupuesto">Fecha Presup.</label>
-		    <input type="date" class="form-control form-control-sm text-right" id="fechaPresupuesto" name="fechaPresupuesto">
-		</div>
-		{# FECHA VENCIMIENTO #}
-		<div class="col-6 mt-0">
-			<label class="lblPresup" for="fechaVencPresup">Fecha Vencim.</label>
-		    <input type="date" class="form-control form-control-sm text-right" id="fechaVencPresup" name="fechaVencPresup">
-		</div>
-	</div>
+<div class="marco-tabs" id="tabPresupMobile">
+	<form id="form_presup1">
+		{# Para CSRF control #}
+		{{ csrf.field | raw }}
 
-	<div class="row">
-		{# REALIZADO POR #}
-		<div class="col-4 mt-2 col-label">
-			<label class="lblPresup" for="emplRealizaPresup">Realizado por</label> 
+		<div class="row">
+			{# FECHA PRESUPUESTO #}
+			<div class="col ml-2 mt-0">
+				<label class="lblPresup text-right" for="fechaPresup">Fecha Presup.</label>
+			    <input type="date" class="form-control form-control-sm text-right" id="fechaPresup" name="fechaPresup">
+			</div>
+			{# FECHA VENCIMIENTO #}
+			<div class="col mt-0 mr-2">
+				<label class="lblPresup" for="fechaVencimiento">Fecha Vencim.</label>
+			    <input type="date" class="form-control form-control-sm text-right" id="fechaVencimiento" name="fechaVencimiento">
+			</div>
 		</div>
-		<div class="col-8 mt-2">
-			<select class="form-control form-control-sm" id="emplRealizaPresup" name="emplRealizaPresup">
-				<option value="0">Seleccione empleado...</option>
-				{% for empl in empleados %}
-					<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
-				{% endfor %}
-			</select>
+
+		<div class="row">
+			{# REALIZADO POR #}
+			<div class="col-4 mt-1">
+				<label class="lblRightPresup" for="idEmpleado">Realizado por</label> 
+			</div>
+			<div class="col mt-3 mr-2">
+				<select class="form-control form-control-sm" id="idEmpleado" name="idEmpleado">
+					<option value="0">Seleccione empleado...</option>
+					{% for empl in empleados %}
+						<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
+					{% endfor %}
+				</select>
+			</div>
 		</div>
-	</div>
+	</form>
 
 	<div class="row">
 		{# DETALLE PRESUPUESTO #}
 		<div class="col mt-3">
 			<div class="accordion" id="accordionAmbientes">
-				<div class="card" id="idCardAmb-0">
-					<div class="card-header" id="cardHeader-0">
+				<div class="card" id="idCardAmb-1">
+					<div class="card-header" id="cardHeader-1">
 						<h2 class="mb-0">
-							<button type="button" class="btn btn-link btn-sm  font-weight-bold" data-toggle="collapse" data-target="#collapseAmb-0" aria-expanded="true" aria-controls="collapseAmb-0">Ambiente 1</button>
+							<button id="btnTituloAmb-1" type="button" class="btn btn-link btn-sm  font-weight-bold" data-toggle="collapse" data-target="#collapseAmb-1" aria-expanded="true" aria-controls="collapseAmb-1">Ambiente 1</button>
 						</h2>
 					</div>
-					<div id="collapseAmb-0" class="collapse show" aria-labelledby="cardHeader-0" data-parent="#accordionAmbientes">
+					<div id="collapseAmb-1" class="collapse show" aria-labelledby="cardHeader-1" data-parent="#accordionAmbientes">
 		      			<div class="card-body">
 		      				<div class="row">
-								<div class="col">
-		      						<textarea id="conceptoAmbiente-0" class="form-control form-control-sm font-weight-bold concepto" placeholder="Conceptos del ambiente 1" rows="1"></textarea>
+								<div class="col mb-2">
+		      						<textarea id="conceptoAmbiente-1" class="form-control form-control-sm concepto" placeholder="Conceptos ambiente 1" rows="1"></textarea>
 								</div>
 							</div>
-						</div>
-					</div>
-					<div id="divTablaProductosAmbiente-0">
-						<div class="row">
-							<div class="col ml-2 mr-3 mb-2">
-								<div class="table-responsive-sm">
-									<table id="table-productos" class="table table-bordered table-hover table-sm mb-1">
-										<thead>
-											<tr>
-												<th colspan="4" class="text-center">Grilla Productos</th>
-												<th colspan="3" class="text-center">Medidas Trabajo</th>
-												<th colspan="3" class="text-center">Medidas Placas</th>
-												<th colspan="3" class="text-center">Cantidad Placas</th>
-												<th></th>
-											</tr>
-											<tr>
-												<th scope="col" class="head2">Tipo Prod.</th>
-												<th scope="col" class="head2">Código</th>
-												<th scope="col" class="head2">Descripción</th>
-												<th scope="col" class="head2">Concepto</th>
-												<th scope="col" class="head2 cell-right">Ancho</th>
-												<th scope="col" class="head2 cell-right">Alto</th>
-												<th scope="col" class="head2 cell-right">Mts2/Mts</th>
-												<th scope="col" class="head2 cell-right">Ancho</th>
-												<th scope="col" class="head2 cell-right">Alto</th>
-												<th scope="col" class="head2 cell-right">Mts2/Mts</th>
-												<th scope="col" class="head2 cell-right">Cant. Ancho</th>
-												<th scope="col" class="head2 cell-right">Cant. Alto</th>
-												<th scope="col" class="head2 cell-right">Cant. Placas</th>
-												<th scope="col" class="head2">Estado Item</th>
-											</tr>
-										</thead>
-										<tbody id="idBodyTablaProds-0">
-											{# Aquí van los productos... #}
-										</tbody>
-									</table>
+
+							{% include 'presupuesto/divTablaProductosAmbiente.twig' %}
+
+							<div class="row">
+								<div class="col ml-1">
+									<button id="btnAgregarProdsAmbiente" onclick="PRESUP.onClickBtnAgregarProd(1);" type="button" class="btn btn-sm btn-primary">Agregar producto</button>
 								</div>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col ml-1">
-								<button id="btnAgregarProdsAmbiente" onclick="PRESUP.onClickBtnAgregarProd(0);" type="button" class="btn btn-sm btn-primary ml-1 mt-2 mb-2">Agregar producto</button>
+      					</div>    {# /card-body #}
+						<div class="card-footer d-flex justify-content-around">
+							{# IMPORTE DEL AMBIENTE #}
+							<label class="lblPresup" for="importeAmbiente-1">Importe Ambiente 1</label>
+							<div>
+								<div class="input-group input-group-sm">
+									<div class="input-group-prepend input-group-sm">
+										<span class="input-group-text">$</span>
+									</div>
+									<input id="importeAmbiente-1" class="form-control form-control-sm cell-right" type="text">
+								</div>
 							</div>
-						</div>
-      				</div>
-				</div>		{# /card #}
-			</div>		{# /acordionAmbientes #}
-		</div>    {# /col #}
-	</div>    {##}
+						</div>  {# /card-footer #}
+					</div>    {# /div id="collapseAmb-0" #}
+				</div>    {# /card id="idCardAmb-0" #} 
+			</div>    {# /acordionAmbientes #}
+		</div>
+	</div>    {# /row DETALLE PRESUPUESTO #}
 
 	<div class="row">
-		<div class="col mt-2">
-			<button id="btnAgregarItem" type="button" class="btn btn-sm btn-warning">Agregar Ambiente</button>
+		<div class="col ml-2 mt-2">
+			<button id="btnAgregarAmbiente" type="button" class="btn btn-sm btn-warning">Agregar Ambiente</button>
 		</div>
 	</div>
 
@@ -105,75 +88,94 @@
 		</div>
 	</div>
 
-	<div class="row">
-		{# TOTAL REVESTIMIENTO #}
-		<div class="col-6 mt-0 col-label">
-			<label class="lblPresup" for="totalMts2Revest">Total Mts2. Revestim.</label>
-		</div>
-		<div class="col-5 mt-0">
-		    <input type="text" class="form-control form-control-sm cell-right" id="totalMts2Revest" name="totalMts2Revest">
-		</div>
-	</div>
-
-	<div class="row">
-		{# TOTAL CIELORRASO #}
-		<div class="col-6 mt-1 col-label">
-			<label class="lblPresup" for="totalMts2Cielorraso">Total Mts2. Cielorraso</label>
-		</div>
-		<div class="col-5 mt-1">
-		    <input type="text" class="form-control form-control-sm cell-right" id="totalMts2Cielorraso" name="totalMts2Cielorraso">
-		</div>
-	</div>
-	<div class="row">
-		{# TOTAL MOLDURAS #}
-		<div class="col-6 mt-1 col-label">
-			<label class="lblPresup" for="totalMtsMolduras">Total Mts. Molduras</label>
-		</div>
-		<div class="col-5 mt-1">
-		    <input type="text" class="form-control form-control-sm cell-right" id="totalMtsMolduras" name="totalMtsMolduras">
-		</div>
-	</div>
-
-	<div class="row">
-		{# IMPORTE #}
-		<div class="col-4 mt-4 col-label">
-			<label class="lblPresup text-right" for="importe">Importe</label>
-		</div>							
-		<div class="col-7 mt-4">
-			<div class="input-group input-group-sm">
-				<div class="input-group-prepend input-group-sm">
-					<span class="input-group-text">$</span>
-				</div>
-				<input id="importe" name="importe" class="form-control form-control-sm cell-right" type="text">
+	<form id="form_presup2">
+		<div class="row">
+			{# TOTAL REVESTIMIENTO #}
+			<div class="col-6">
+				<label class="lblPresup float-right" for="totalMts2Revest">Total Mts2. Revestim.</label>
+			</div>
+			<div class="col-5 mt-0">
+			    <input type="text" class="form-control form-control-sm cell-right" id="totalMts2Revest" name="totalMts2Revest">
 			</div>
 		</div>
-	</div>
 
-	<div class="row">
-		<div class="col ml-1 mr-1">
-			<hr>
-		</div>
-	</div>
-
-	<div class="row">
-		{# FORMA DE PAGO #}
-		<div class="col mr-3 col-label d-flex flex-column">
-			<label class="lblPresup" for="formaDePago">Forma de Pago</label> 
-			<textarea class="form-control" id="formaDePago" name="formaDePago" rows="2"></textarea>
-		</div>
-	</div>
-
-	<div class="row">
-		{# ENTREGA/SEÑA #}
-		<div class="col-4 mt-4 col-label">
-			<label class="lblPresup text-right" for="entrega">Entrega/Seña</label>
-		</div>							
-		<div class="col-7 mt-4">
-			<div class="input-group input-group-sm">
-				<div class="input-group-prepend input-group-sm">
-					<span class="input-group-text">$</span>
-				</div>
-				<input id="entrega" name="entrega" class="form-control form-control-sm cell-right" type="text">
+		<div class="row">
+			{# TOTAL CIELORRASO #}
+			<div class="col-6">
+				<label class="lblPresup float-right" for="totalMts2Cielorraso">Total Mts2. Cielorraso</label>
+			</div>
+			<div class="col-5 mt-1">
+			    <input type="text" class="form-control form-control-sm cell-right" id="totalMts2Cielorraso" name="totalMts2Cielorraso">
 			</div>
 		</div>
+		<div class="row">
+			{# TOTAL MOLDURAS #}
+			<div class="col-6">
+				<label class="lblPresup float-right" for="totalMtsMolduras">Total Mts. Molduras</label>
+			</div>
+			<div class="col-5 mt-2">
+			    <input type="text" class="form-control form-control-sm cell-right" id="totalMtsMolduras" name="totalMtsMolduras">
+			</div>
+		</div>
+
+		<div class="row">
+			{# IMPORTE #}
+			<div class="col-4">
+				<label class="lblRightPresup" for="importePresup">Importe</label>
+			</div>							
+			<div class="col-7 mt-2">
+				<div class="input-group input-group-sm">
+					<div class="input-group-prepend input-group-sm">
+						<span class="input-group-text">$</span>
+					</div>
+					<input id="importePresup" name="importePresup" class="form-control form-control-sm cell-right" type="text">
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col ml-1 mr-1">
+				<hr>
+			</div>
+		</div>
+
+		<div class="row">
+			{# FORMA DE PAGO #}
+			<div class="col ml-2 mr-2">
+				<label class="lblPresup" for="formaDePago">Forma de Pago</label> 
+				<textarea class="form-control" id="formaDePago" name="formaDePago" rows="2"></textarea>
+			</div>
+		</div>
+
+		<div class="row">
+			{# ENTREGA/SEÑA #}
+			<div class="col-5">
+				<label class="lblRightPresup" for="entrega">Entrega/Seña</label>
+			</div>							
+			<div class="col-6 mt-2 mb-2">
+				<div class="input-group input-group-sm">
+					<div class="input-group-prepend input-group-sm">
+						<span class="input-group-text">$</span>
+					</div>
+					<input id="entrega" name="entrega" class="form-control form-control-sm cell-right" type="text">
+				</div>
+			</div>
+		</div>
+	</form>
+
+	<div class="row">
+		<div class="col ml-4 mr-4 mt-0">
+			<hr />
+		</div>
 	</div>
+
+	<div class="d-flex justify-content-center mb-4">
+		<button id="btnSalvarPresup" 
+				onclick="PRESUP.onClickBtnSalvarPresup();"
+				type="button" 
+				class="btn btn-sm btn-success">
+			Guardar presupuesto
+		</button>
+	</div>
+
+</div>

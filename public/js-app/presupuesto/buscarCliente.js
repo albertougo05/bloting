@@ -2,7 +2,7 @@
 // Funcion para buscar cliente y llenar formulario de presupuesto
 // 
 
-export function buscarCliente( id, url ) {
+export function buscarCliente(id, url) {
 
 	//console.log('Class BF - Id: ' + id);
 	$.ajax(
@@ -13,8 +13,7 @@ export function buscarCliente( id, url ) {
         success: function(data, textStatus, jqXHR) 
         {
 			let dataObj = $.parseJSON(data);
-			//console.log('Id: ' + dataObj.id + 'Nombre: ' + dataObj.Nombre);
-			_datosAlFormulario(dataObj);		//	Llenar lo campos del from  -- NO SE PUEDE LLAMAR A FUNCIONES INTERNAS ?
+			_clienteAlFormulario(dataObj);		//	Llenar lo campos del from  -- NO SE PUEDE LLAMAR A FUNCIONES INTERNAS ?
         },
         error: function(jqXHR, textStatus, errorThrown) 
         {
@@ -30,15 +29,19 @@ export function buscarCliente( id, url ) {
 // Funciones privadas
 //
 
-// Llenar los campos del formulario...    --  SERIA UNA FUNCION INTERNA Y NO LA LLAMA (??)
-let _datosAlFormulario = function (data) { 
-	$('input#cliente_id').val(data.id);
+// Llenar los campos del formulario... 
+let _clienteAlFormulario = function (data) {
+	$('input#id_cliente').val(data.id);
 	$('input#nombre').val(data.Nombre);
 	$('input#domicilio').val(data.Direccion);
 	$('input#localidad').val(data.Localidad);
+	$('input#codPostal').val(data.CodPostal);
+	$('select#provincia').val(data.Provincia).change();
+	$('select#pais').val(data.Pais).change();;
 	$('input#telefono').val(data.Telefono);
 	$('input#celular').val(data.Celular);
 	$('input#cuitdni').val(data.CUIT);
+	$('input#contacto').val(data.Contacto);
 	$('input#email').val(data.Email);
 
 	return null;

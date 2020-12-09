@@ -2,7 +2,11 @@ import { buscarCliente } from './buscarCliente.js';
 import { FOTOS } from './guardarFotos.js';
 import ManejoAmbientes from './ManejoAmbientes.js';
 import IngresoProds from './IngresoProds.js';
-import guardarPresup from './guardarPresup.js';
+import guardarComprob from './guardarComprob.js';
+import buscarComprobante from './buscarComprobante.js';
+import buscarRegistro from './buscarRegistro.js';
+import buscarPresupuesto from './buscarPresup.js';
+
 
 
 //
@@ -16,8 +20,9 @@ import guardarPresup from './guardarPresup.js';
 	$('#fechaTentativa').val(PRESUP.fecha);
 	$('#fechaPresupuesto').val(PRESUP.fecha);
 
-	$('#id_presup').val(PRESUP.id_presup); 
-	$('#id_presup_pant').val(PRESUP.id_presup); 
+	$('#id').val(PRESUP.id_presup);
+	$('#nroComprobante').val(PRESUP.id_presup);
+	$('#idComprobPant').val(PRESUP.id_presup);
 	$('#btnMasDatos').html('Más datos...');
 	$('#provincia').val('Córdoba'); 
 
@@ -25,46 +30,75 @@ import guardarPresup from './guardarPresup.js';
 		console.log("Es mobile !");
 	else console.log("NO es mobile !");
 
-	// Set toastr options
-	toastr.options = {
-	  "closeButton": true,
-	  "debug": false,
-	  "newestOnTop": false,
-	  "progressBar": false,
-	  "positionClass": "toast-bottom-full-width",
-	  //"positionClass": "toast-bottom-center",
-	  "preventDuplicates": false,
-	  "onclick": null,
-	  "showDuration": "300",
-	  "hideDuration": "1000",
-	  "timeOut": "5000",
-	  "extendedTimeOut": "1000",
-	  "showEasing": "swing",
-	  "hideEasing": "linear",
-	  "showMethod": "fadeIn",
-	  "hideMethod": "fadeOut"
-	};
-
 })();
+
+
+// Set toastr ERROR options
+PRESUP.toastrErrorOptions = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": false,
+  "progressBar": false,
+  "positionClass": "toast-bottom-full-width",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+};
+
+// Set to error options
+toastr.options = PRESUP.toastrErrorOptions;
+
+// Set toastr SUCCESS and timeOver options
+PRESUP.toastrSuccessOptions = {
+  "closeButton": false,
+  "debug": false,
+  "newestOnTop": false,
+  "progressBar": true,
+  "positionClass": "toast-bottom-full-width",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+
 
 
 PRESUP.winBuscar = false;    // Variable para saber que está abierta la ventana de búsqueda
 PRESUP.objWinBuscar = {};    // Ventana de búsqueda
+PRESUP.padCero = (num) => {
+	let str = String(num);
 
+	if (str.length === 1) { 
+		str = "0" + str; 
+	}
+
+	return str;
+}
 
 /**
  * 
  * MANEJO AMBIENTES EN TAB PRESUPUESTO
  * 
  */
-PRESUP._ambientes = new ManejoAmbientes();		// Clase para carga de ambientes
+PRESUP._ambientes = new ManejoAmbientes(PRESUP.isMobile);		// Clase para carga de ambientes
 PRESUP._ambientes.crearAmbiente();
 
 PRESUP.onClickBtnEliminaAmb = (id) => {
 	const nombreAmb = PRESUP._ambientes.getTitulo(id);
-
-console.log('Elimino Ambiente id:', id);
-
+//console.log('Elimino Ambiente id:', id);
 	$.confirm({
 	    title: '<h3><strong>Confirmar !</strong></h3>',
 	    content: 'Va a <strong>eliminar</strong>: ' + nombreAmb,
@@ -75,10 +109,9 @@ console.log('Elimino Ambiente id:', id);
             	text: 'Eliminar',
             	btnClass: 'btn-red',
             	action: function () {
+            		PRESUP._ingresoProds.eliminarProdsAmbiente(id);
+            		PRESUP._ingresoProds.actualizarInputsPorElim();
 					PRESUP._ambientes.eliminar(id);
-
-					// Eliminar productos....   ( FALTA !!! )
-
 				}
 	        },
 	        cancel: {
@@ -89,118 +122,90 @@ console.log('Elimino Ambiente id:', id);
 }
 
 
+
+
 /**
  * 
  * MANEJO PRODUCTOS EN TAB PRESUPUESTO
  * 
  */
-PRESUP._ingresoProds = new IngresoProds(PRESUP.productos);
+PRESUP._ingresoProds = new IngresoProds(PRESUP.productos, PRESUP.estadosItem);
 
-PRESUP.onClickBtnAgregarProd = (id) => {
-		PRESUP._ingresoProds.resetForm();
+PRESUP.onClickBtnAgregarProd = id => {
+		PRESUP._ingresoProds.resetFormModal();
 		PRESUP._ingresoProds.setIdAmbienteSelec(id);
 		$('#modIngresoProd').modal('show');
+}
+
+PRESUP.onChangeSelectEstadoItem = objSelect => {
+	PRESUP._ingresoProds.setCambioEstado(objSelect.value, 
+										 objSelect.dataset.idamb, 
+										 objSelect.dataset.idprod, 
+										 objSelect.dataset.idtipoprod);
+};
+
+PRESUP._updateMedidas = function (medidas) {		// medidas = {totalMts2Revest, totalMts2Cielorraso, totalMtsMolduras}
+	const input_totalMts2Revest     = document.getElementById('totalMts2Revest');
+	const input_totalMts2Cielorraso = document.getElementById('totalMts2Cielorraso');
+	const input_totalMtsMolduras    = document.getElementById('totalMtsMolduras');
+
+	const totalMts2Revest     = COMMONS.realParseFloat( input_totalMts2Revest.value );
+	const totalMts2Cielorraso = COMMONS.realParseFloat( input_totalMts2Cielorraso.value );
+	const totalMtsMolduras    = COMMONS.realParseFloat( input_totalMtsMolduras.value );
+
+	input_totalMts2Revest.value     = totalMts2Revest + medidas.totalMts2Revest;
+	input_totalMts2Cielorraso.value = totalMts2Cielorraso + medidas.totalMts2Cielorraso; 
+	input_totalMtsMolduras.value    = totalMtsMolduras + medidas.totalMtsMolduras;
 }
 
 
 
 
+/**
+ * CLICK GUARDAR TAB REGISTRO VISITAS
+ */
+PRESUP.onClickBtnGuardarRegistro = function () {
+	guardarComprob.salvarRegistro(PRESUP.pathGuardarRegist);
+}
 
-PRESUP.validarForm = () => {
-	// Fecha
-	if ( COMMONS.isEmpty( $('#fecha').val() ) ) {
-		toastr.error("Error en Presupuesto", "Debe ingresar una fecha !!");
-		$('#fecha').focus();
-		return false;
-	}
-	// Nombre
-	if ( COMMONS.isEmpty( $('#nombre').val() ) ) {
-		toastr.error("Error en Presupuesto", "Debe ingresar un Nombre !!");
-		$('#nombre').focus();
-		return false;
-	}
-	// Domicilio
-	if ( COMMONS.isEmpty( $('#domicilio').val() ) ) {
-		toastr.error("Error en Presupuesto", "Debe ingresar un Domicilio !!");
-		$('#domicilio').focus();
-		return false;
-	}
-	// Localidad
-	if ( COMMONS.isEmpty( $('#localidad').val() ) ) {
-		toastr.error("Error en Presupuesto", "Debe ingresar un Localidad !!");
-		$('#localidad').focus();
-		return false;
-	}
-	// idEmplHaceRegistro
-	if ( $('#empleadoHaceRegistro :selected').val() == 0 ) {
-		toastr.error("Error en Registro Visita", "Debe ingresar empleado hace el registro !!");
-		$('#empleadoRealizaRegistro').focus();
-		return false;
-	}
-	// Detalle del registro
-	if ( COMMONS.isEmpty( $('#detalleRegistro').val() ) ) {
-		toastr.error("Error en Presupuesto", "Debe ingresar un detalle de registro !!");
-		$('#detalleRegistro').focus();
-		return false;
-	}
+/**
+ * CLICK GUARDAR TAB PRESUPUESTO
+ */
+PRESUP.onClickBtnSalvarPresup = function () {
+	//const guardaOk = guardarComprob.salvarPresup(PRESUP.pathGuardarPresup);
 
-	// Fecha tentetiva de visita
-	if ( COMMONS.isEmpty( $('#fechaTentativa').val() ) ) {
-		toastr.error("Error en Presupuesto", "Debe ingresar fecha tentativa de visita !!");
-		$('#fechaTentativa').focus();
-		return false;
-	}
+	//if (guardaOk) {		// Salvar ambientes y sus productos
+		// Eliminar productos y ambientes eliminados
+		PRESUP._ambientes.eliminarAmbienteYProdsDelDisco(PRESUP.pathEliminaaAmb, PRESUP.id_presup);
+	//	PRESUP._ambientes.salvarAmbientes(PRESUP.pathGuardarAmbien, PRESUP.id_presup);
+		//PRESUP._ingresoProds.salvarProductosDeAmbientes(PRESUP.pathGuardarProduc, PRESUP.id_presup);
+	//} else { 
+	//	toastr.error('No se guardó presupuesto !', "ERROR, intente cerrar la aplicación !"); 
+	//}
+}
 
-	return true;
-};
+/**
+ * CLICK GUARDAR TAB ORDEN DE TRABAJO
+ */
+PRESUP.onClickBtnGuardarOrdenT = function () {
+	guardarComprob.salvarOrdenT();
+}
 
-PRESUP.guardarForm = function () {
-	//const formElement = document.querySelector("form");
-	//const formData = new FormData(formElement);
-	const formData = guardarPresup.recolectarData();
-
-console.log('FormData: ', formData);
-
-	const options = {
-		method: 'POST',
-		//mode: 'cors',
-		body: formData
-	}
-	//const req = new Request(this.pathGuardar, options);
-
-
-// ESTE FETCH TENDRIA QUE IR EN LA FUNCION guardarPresup() [imported]
+/**
+ * CLICK GUARDAR TAB FOTOS
+ */
+PRESUP.onClickBtnGuardarFotos = function () {
+	guardarComprob.salvarFotos(PRESUP.listaDeFotos);
+}
 
 
 
-/*
-	fetch(req)
-		.then((response) => {
-			if (response.ok) {
-				return response.json();
-			} else {
-				throw  new Error('Error de escritura !!')
-			}
-		})
-		.then( (data) => {		// Si todo está Ok, data es un json
-			console.log(data);
-			PRESUP.exitoEnGuardar();
-		})
-		.catch( (err) => {
-			console.log('ERROR: ', err.message);
-			toastr.error("Error en Presupuesto", "Error al guardar datos !!");
-		});
-*/
-};
 
-PRESUP.exitoEnGuardar = () => {
-	$('#spinnerGuardar').hide();
-	toastr.success("Presupuesto", "Presupuesto guardado con éxito !!");
-	$('#btnImprime').prop( 'disabled', false );
-	$('#btnConfirma').prop( 'disabled', true );
-};
-
-
+/**
+ * 
+ * BUSCAR CLIENTE
+ *
+ */
 PRESUP.winBuscarCliente = function (elem) {		// Crea ventana para buscar Cliente  top=500,left=500,
 	const left   = (screen.width/2)-450,    // (width/2)
           top    = (screen.height/2)-350;   //  (height/2);
@@ -220,7 +225,7 @@ PRESUP.winBuscarCliente = function (elem) {		// Crea ventana para buscar Cliente
 				// console.log("Se cierra la ventana buscar... (" + dato + ")");
 				this.close();
 				PRESUP.winBuscar = false;
-				//document.getElementById("formPresup").reset();   // Reset del form
+				//document.getElementById("form_comprob").reset();   // Reset del form
 				buscarCliente( dato, PRESUP.pathGetCliente ); 	// En archivo importado buscarCliente.js gestiona la busqueda del cliente (dato = id cliente)
 			}
 		});
@@ -231,6 +236,12 @@ PRESUP.winBuscarCliente = function (elem) {		// Crea ventana para buscar Cliente
 	return null;
 };
 
+
+/**
+ * 
+ * BUSCAR COMPROBANTE COMPLETO
+ * 
+ */
 PRESUP.winBuscarPresup = function () {		// Crea ventana para buscar presupuesto  top=500,left=500,
 	const left   = (screen.width/2)-450,    // (width/2)
           top    = (screen.height/2)-350;   //  (height/2);
@@ -244,14 +255,22 @@ PRESUP.winBuscarPresup = function () {		// Crea ventana para buscar presupuesto 
 		this.objWinBuscar.addEventListener("click", function(){		// Agego evento click a la ventana de Buscar
 			let cerrar = this._cerrar;   // En ventana buscar presupuesto
 			let idPresup = '';
-			//console.log("click en ventana buscar...");
+
 			if (cerrar) {
 				idPresup = this._idPresup;
 				// console.log("Se cierra la ventana buscar... (" + idPresup + ")");
 				this.close();
 				PRESUP.winBuscar = false;
-				//document.getElementById("formPresup").reset();   // Reset del form
-				PRESUP.buscarPresup( idPresup ); 
+				PRESUP.guardado = true;		// Para permitir guardar Tabs
+				buscarComprobante(idPresup, PRESUP.pathGetComprob);
+				PRESUP.id_presup = idPresup;	// Set el id del comprobante
+				buscarRegistro(idPresup, PRESUP.pathGetRegistro);
+				buscarPresupuesto(idPresup, PRESUP.pathGetPresupuesto);
+				PRESUP._ambientes.buscarAmbientes(idPresup, PRESUP.pathGetAmbientes);
+				PRESUP._ingresoProds.buscarProductos(idPresup, PRESUP.pathGetProductos);
+				// buscarOrdenTrab()
+				// buscarFotos()
+				// buscarExtras()
 			}
 		});
 		this.objWinBuscar.addEventListener("beforeunload", function (e) {
@@ -261,67 +280,19 @@ PRESUP.winBuscarPresup = function () {		// Crea ventana para buscar presupuesto 
 	return null;
 };
 
-PRESUP.buscarPresup = function ( id ) {
-	$.ajax(
-    {
-        url : PRESUP.pathGetPresup,
-        type: "GET",
-        data: { id: id },
-        success: function(data, textStatus, jqXHR) 
-        {
-			let dataObj = $.parseJSON(data);
-			//console.log('Id: ' + dataObj.id + 'Nombre: ' + dataObj.Nombre);
-			PRESUP.datosAlFormulario(dataObj);
-        },
-        error: function(jqXHR, textStatus, errorThrown) 
-        {
-            console.log('Status de error: ' + textStatus);
-            toastr.error("Presupuesto", "Error al buscar Presupuesto !!");
-        }
-    });
-
-	return null;
-}
-
-PRESUP.datosAlFormulario = function (data) { 
-	$('input#id').val(data.id);
-	$('input#id_presup').val(data.id);
-	$('input#id_cliente').val(data.id_cliente);
-	$('input#fecha').val(data.fecha);
-	$('input#nombre').val(data.nombre);
-	$('input#domicilio').val(data.domicilio);
-	$('input#localidad').val(data.localidad);
-	$('input#codPostal').val(data.codPostal);
-	$('select#provincia').val(data.provincia).change();
-	$('select#pais').val(data.pais).change();
-	$('input#telefono').val(data.telefono);
-	$('input#celular').val(data.celular);
-	$('input#cuitdni').val(data.cuitdni);
-	$('input#contacto').val(data.contacto);
-	$('input#email').val(data.email);
-	$('textarea#observaciones').val(data.observaciones);
-
-	$('input#importe').val(data.importe);
-
-	//Habilito boton Imprimir
-	$('#btnImprime').prop('disabled', false);
-
-	return null;
-}
-
 
 
 /*
  *
- *
  * CODIGO jQUERY (EVENTOS) ********************************************************************************
  *
- * 
  */
 $( function () {
+	const inputs1 = 'input#anchoTrabajo, input#altoTrabajo, input#totalMts2Revest, input#totalMts2Cielorraso, ',
+		  inputs2 = 'input#totalMtsMolduras, input#importeProd, input#importePresup, input#importeAmbiente-1';
 
-	// Input Mask para inputs
-    $('input#anchoTrabajo, input#altoTrabajo, input#totalMts2Revest, input#totalMts2Cielorraso, input#totalMtsMolduras').inputmask("numeric", {
+	// Input Mask para inputs con ids
+    $(inputs1 + inputs2).inputmask("numeric", {
         radixPoint: ",",
         groupSeparator: ".",
         digits: 2,
@@ -369,12 +340,12 @@ $( function () {
 
     // Inicializo input fotos
     FOTOS.agregaNombreImagenAlInput();
-	// Lista de fotos del presupuesto (Debe ir al traer presupuesto)
-	PRESUP.listaDeFotos.push('/img/trabajo1.jpg', '/img/trabajo2.jpg', '/img/trabajo3.jpg');
-	// Ingreso fotos al contenedor
-	FOTOS.fotosAlContenedor(PRESUP.listaDeFotos, PRESUP.isMobile);
     // Click en fotos
-    FOTOS.clickEnImagen();
+    FOTOS.eventoClickEnImagen();
+
+	$('#btnAgregarFoto').click(function () {
+		FOTOS.agregarFoto(PRESUP.isMobile);
+	});
 
     // Al iniciar el Modal Agregar Producto
 	$('#modIngresoProd').on('shown.bs.modal', function () {
@@ -385,14 +356,13 @@ $( function () {
 	$('button#btnAgregarAmbiente').click(function (e) {
 		PRESUP._ambientes.crearAmbiente();
 		PRESUP._ambientes.mostrarNuevoAmbiente();
-		const element = document.getElementById("pills-tabContent");		// Scroll hasta las etiquetas
-		element.scrollIntoView();
 	});
 
 	// Focus on Fecha
 	$('#fecha').focus();
 	// Inicializa tooltips
 	$('[data-toggle="tooltip"]').tooltip();
+
 	// Inicializa input importe
     $('input#importe, input#entrega').inputmask("numeric", {
         radixPoint: ",",
@@ -402,18 +372,31 @@ $( function () {
         //prefix: '$ ', //Space after $, this will not truncate the first character.
         rightAlign: false,
         unmaskAsNumber: true, 
-        oncleared: function () { self.value(''); }
+        oncleared: function () { self.value = ''; }
     });
 
-	// Click en boton Guardar
+	// Click en botones Confirma y Guardar
 	$('#btnConfirma, a#guardar').click( function(e) {
 
-		if ( PRESUP.validarForm() ) {
+		if ( guardarComprob.validarComprob() ) {
 			$('#spinnerGuardar').show();
-			PRESUP.guardarForm();
+			guardarComprob.salvarComprob(PRESUP.pathGuardar);
 		}
 
 		return null;
+	});
+
+	// Al cambiar fecha de tab presupuesto, cambia la de vencimiento a 30 dias mas
+	$('input#fechaPresup').change(function(event) {
+		const fecha = $(this).val();
+		const date = new Date(fecha);
+		const copy = new Date(Number(date));
+		copy.setDate(date.getDate() + 31);
+		const mes = copy.getMonth() + 1;
+		const dia = copy.getDate();
+		const fechaVenc = copy.getFullYear() + '-' + PRESUP.padCero(mes) + '-' + PRESUP.padCero(dia);
+
+		$('#fechaVencimiento').val(fechaVenc);
 	});
 
 	// Click link Buscar cliente
@@ -449,12 +432,20 @@ $( function () {
 		}
 	});
 
-	// Atrapar el submit del form fotos
-	$('form#form_foto').submit(function (e) {
-		e.preventDefault();
-		FOTOS.guardarFoto();
+	// On Blur conceptos
+	$('textarea ').onB
 
-		return null;
+	// Al desplegar la etiqueta (en mobile)...
+	$('#acordionTipoComprobante').on('show.bs.collapse', function () {
+		const element = document.getElementById("tabPresupMobile");		// Scroll hasta las etiquetas
+		element.scrollIntoView();
+	});
+
+	// Al desplegar la etiqueta (en desktop)...
+	$('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+	  //e.target // newly activated tab // e.relatedTarget // previous active tab
+		const element = document.getElementById("etiquetas");		// Scroll hasta las etiquetas
+		element.scrollIntoView();
 	});
 
 	// Change select TipoProducto en Modal
@@ -474,25 +465,57 @@ $( function () {
 		const ancho = parseFloat( document.getElementById("anchoTrabajo").value ) || 0;
 		const alto  = parseFloat( document.getElementById("altoTrabajo").value ) || 0;
 
-		if ( ancho > 0 || alto > 0 ) {
+		if ( ancho > 0 ) {
 			PRESUP._ingresoProds.calculoMedidas();
+			document.getElementById('importeProd').focus();
+		} else {
+			toastr.error('Debe ingresar Ancho del trabajo', "ERROR, faltan datos !");
 		}
 	});
 
 	// Click en boton Confirma Modal Ingreso de Productos
 	$('button#btnConfirmaModalProds').click(function (e) {
-		// Guardar datos de producto selecionado
-		PRESUP._ingresoProds.setProductoSeleccionado();
-		$('#modIngresoProd').modal('hide');
+		const validModalProd = PRESUP._ingresoProds.validarModalProd();
+
+		if ( validModalProd.notPass ) {
+			toastr.error(validModalProd.message, "ERROR, faltan datos !");
+			$(validModalProd.elem).focus();
+		} else {
+			PRESUP._ingresoProds.setProductoSeleccionado();
+			const idAmbSel = PRESUP._ingresoProds.getIdAmbienteSelec(),
+				  importeProd = PRESUP._ingresoProds.getImporteProdSelec();
+			PRESUP._ambientes.setImporte( idAmbSel, importeProd);
+			PRESUP._updateMedidas(PRESUP._ingresoProds.getMedidasProdSelec())
+
+			$('#modIngresoProd').modal('hide');
+
+			const idConceptAmb = 'conceptoAmbiente-' + idAmbSel;
+			const textoConceptoAmb = $('#' + idConceptAmb).val();
+			if (textoConceptoAmb.trim() === '') {
+				toastr.error('Debe ingresar concepto ambiente', "ERROR, faltan datos !");
+				$('#' + idConceptAmb).focus();
+			}
+		}
 	});
 
+	// Evento onChange select de tabla de productos
+	$('select ')
+
 	// Evento antes de cerrar la ventana
-	$(window).on("beforeunload", function()
+	$(window).on("beforeunload", function(e)
 	{
-		if (PRESUP.winBuscar) {		// Si está abierta la ventana de buscar firma..
+		if (PRESUP.winBuscar) {		// Si está abierta la ventana de buscar presupuesto
 			PRESUP.objWinBuscar.close();    // ... la cierra
 		}
-		
+
+		// POR AHORA NO VA A BORRAR LAS FOTOS, SI NO GUARDA EL DOCUMENTO
+		// if (PRESUP.nuevasFotos.length > 0 && !PRESUP.guardado) {
+		//  	FOTOS.borrar(PRESUP.nuevasFotos, PRESUP.pathBorrarFoto)
+		//  		.then(data => {
+		//				console.log(data);
+		//  			console.log('Ya está !');
+		//  	});
+		// }
 	});
 
 });

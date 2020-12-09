@@ -63,18 +63,39 @@ var COMMONS = {
 
   // Devuelve verdadero si el string está vacio
   isEmpty: function(str) {    // Verifica string vacios
+    if ( !str ) return true;
 
     return (str.length === 0 || !str.trim());
   },
 
-  // Convierte string '1.250,25' A (float) 1250.25
-  strToFloat: function(num) {
-    num = num.replace('.', '');
-    num = num.replace(',', '.');
-    num = parseFloat(num);
+  realParseFloat: function (s)
+  {
+      if (typeof s === 'number') {
+        return s;
+      }
 
-    return num.toFixed(2);
-  },
+      if (typeof s == 'undefined' || !s || s.length === 0 || s === "" || !/[^\s]/.test(s) || /^\s*$/.test(s) || s.replace(/\s/g,"") === "")
+        return 0;
+      //if ( s === '') return 0;
+
+      s = s.replace(/[^\d,.-]/g, ''); // strip everything except numbers, dots, commas and negative sign
+      if (navigator.language.substring(0, 2) !== "es" && /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(s)) // if not in German locale and matches #,###.######
+      {
+          s = s.replace(/,/g, ''); // strip out commas
+          return parseFloat(s); // convert to number
+      }
+      else if (/^-?(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d+)?$/.test(s)) // either in German locale or not match #,###.###### and now matches #.###,########
+      {
+          s = s.replace(/\./g, ''); // strip out dots
+          s = s.replace(/,/g, '.'); // replace comma with dot
+          return parseFloat(s);
+      }
+      else // try #,###.###### anyway
+      {
+          s = s.replace(/,/g, ''); // strip out commas
+          return parseFloat(s); // convert to number
+      }
+  }
 
 
 

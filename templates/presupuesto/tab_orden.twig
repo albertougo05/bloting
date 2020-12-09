@@ -1,47 +1,66 @@
 <div class="marco-tabs">
 
+	<form id="form_ordenTrab">
+		{# Para CSRF control #}
+		{{ csrf.field | raw }}
+
+		<div class="row">
+			{# FECHA TENTATIVA TRABAJO #}
+			<div class="col-sm-2 mt-4 col-label">
+				<label class="labelOT" for="fechaTentativa">Fecha Tentativa O.T.</label>
+			</div>
+			<div class="col-sm-3 mt-4">
+			    <input type="date" class="form-control form-control-sm" id="fechaTentativa" name="fechaTentativa">
+			</div>
+			{# FECHA EJECUCION #}
+			<div class="col-sm-2 offset-sm-1 mt-4 col-label">
+				<label class="labelOT" for="fechaEjecucion">Fecha Ejecución</label>
+			</div>
+			<div class="col-sm-3 mt-4">
+			    <input type="date" class="form-control form-control-sm" id="fechaEjecucion name="fechaEjecucion>
+			</div>
+		</div>
+
+		<div class="row">
+			{# DETALLE ORDEN DE TRABAJO #}
+			<div class="col-sm-2 col-label">
+				<label class="labelOT" for="detalle">Detalle O.T.</label> 
+			</div>
+			<div class="col-sm-9 mt-2">
+				<textarea class="form-control" id="detalle" name="detalle" rows="4"></textarea>
+			</div>
+		</div>
+
+		<div class="row">
+			{# REALIZADO POR #}
+			<div class="col-sm-2 mt-2 col-label">
+				<label class="labelOT" for="idEmpleado">Realizado por</label> 
+			</div>
+			<div class="col-sm-4 mt-2">
+				<select class="form-control form-control-sm" id="idEmpleado" name="idEmpleado">
+					<option value="0">Seleccione empleado...</option>
+					{% for empl in empleados %}
+						<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+
+	</form>
+
 	<div class="row">
-		{# FECHA TENTATIVA TRABAJO #}
-		<div class="col-sm-2 mt-4 col-label">
-			<label class="lblPresup" for="fechaTentaTrabajo">Fecha Tentativa O.T.</label>
-		</div>
-		<div class="col-sm-3 mt-4">
-		    <input type="date" class="form-control form-control-sm" id="fechaTentaTrabajo" name="fechaTentaTrabajo">
-		</div>
-		{# FECHA EJECUCION #}
-		<div class="col-sm-2 offset-sm-1 mt-4 col-label">
-			<label class="lblPresup" for="fechEjecucionOT">Fecha Ejecución</label>
-		</div>
-		<div class="col-sm-3 mt-4">
-		    <input type="date" class="form-control form-control-sm" id="fechaEjecucionOT name="fechaEjecucionOT>
+		<div class="col ml-4 mr-4 mt-0">
+			<hr />
 		</div>
 	</div>
 
-	<div class="row">
-		{# DETALLE ORDEN DE TRABAJO #}
-		<div class="col-sm-2 mt-2 col-label">
-			<label class="lblPresup" for="detalleOrdenTrabajo">Detalle Orden Trabajo</label> 
-		</div>
-		<div class="col-sm-9 mt-2">
-			<textarea class="form-control" id="detalleOrdenTrabajo" name="detalleOrdenTrabajo" rows="4"></textarea>
-		</div>
+	<div class="d-flex justify-content-center mb-3">
+		<button id="btnGuardarOrdenT" 
+				onclick="PRESUP.onClickBtnGuardarOrdenT();"
+				type="button" 
+				class="btn btn-sm btn-success">
+			Guardar Orden Trabajo
+		</button>
 	</div>
-
-	<div class="row">
-		{# REALIZADO POR #}
-		<div class="col-sm-2 mt-2 col-label">
-			<label class="lblPresup" for="emplRealizaOrdTrab">Realizado por</label> 
-		</div>
-		<div class="col-sm-4 mt-2">
-			<select class="form-control form-control-sm" id="emplRealizaOrdTrab" name="emplRealizaOrdTrab">
-				<option value="0">Seleccione empleado...</option>
-				{% for empl in empleados %}
-					<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
-				{% endfor %}
-			</select>
-		</div>
-	</div>
-
-	<br />
 
 </div>

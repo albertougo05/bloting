@@ -5,37 +5,52 @@
 //wrap your emojis in a span with these properties to remove a warning <span role="img" aria-label="star"> ⭐ </span>
 
 var FOTOS = {
-	// 
-	// Agrega el nombre del archivo de imagen al label
-	// 
-	fotosAlContenedor: (listado, ismobile) => {
-		const path = 'http://' + window.location.host;
-		const pathTemp = '/bloting/public';		// Para server tridimjm.xyz
 
-		listado.forEach( img => {
-			FOTOS.crearDivConFoto(path + img, ismobile);
-			// FOTOS.crearDivConFoto(path + pathTem + img);
+	// Fotos de la lista de la BD al contenedor
+	fotosAlContenedor: (listado, ismobile) => {
+//		let path = './uploads/';
+
+//		if (ismobile) {
+//			path = '/bloting/public';		// Para server tridimjm.xyz
+//		} else {
+//			path = 'http://' + window.location.host;
+//		}
+
+// Cagar las fotos que están en el disco. Los nombres vienen de la base de datos (listado)
+
+		listado.forEach( nombreImg => {
+			FOTOS.crearDivConFoto(nombreImg, ismobile);
 			//console.log('Path img: ' + path + img);
 		});
 	},
 
-	crearDivConFoto: function (url, ismobile) {
-	    // Creo elemento div
-	    let div = document.createElement('div'); 
-	    // Creo elemento imagen
-	    let imagen = document.createElement('img');
+	crearDivConFoto: function (nombreimg, ismobile, image='') {
+		let url = '';
+
+		if (image == '') {
+			url = './uploads/' + nombreimg;
+		} else {
+			url = image.src;
+		}
+
+	    let div = document.createElement('div'), 	    // Creo elemento div
+	    	imagen = document.createElement('img'),	    // Creo elemento imagen
+	    	texto = document.createElement('p');
+
+	    imagen.className = "img-fluid";
+	    imagen.dataset.nombre = nombreimg;
 
 	    if (ismobile) {
-	    	div.className = "col mb-3 thumbnail-image-container img-fluid";
-	    	imagen.className = "img-thumbnail w-100";	    	
+	    	div.className = "row mb-3";
+	    	texto.textContent = nombreimg;
+	    	div.appendChild(texto);
 	    } else {
-	    	imagen.className = "img-thumbnail w-80";
-	    	div.className = "col-2 thumbnail-image-container img-fluid";  	
+	    	//imagen.className = "img-thumbnail w-80";
+	    	div.className = "col-2 img-fluid";	// thumbnail-image-container
 	    }
 
 	    imagen.src = url;
-	    // Agrego img al div
-	    div.appendChild(imagen);
+	    div.appendChild(imagen);	    // Agrego img al div
 	    // Agrego div al container
 	    let fotosContainer = document.getElementById('fotosContainer');
 	    fotosContainer.appendChild(div);
@@ -43,9 +58,9 @@ var FOTOS = {
 
 	agregaNombreImagenAlInput: () => {
 		document.querySelector('.custom-file-input')
-			.addEventListener('change',function (e) {
+			.addEventListener('change', function (e) {
 				const fileName = document.getElementById("inputFoto").files[0].name;
-				const extension = fileName.substring(fileName.lastIndexOf('.')+1);
+				const extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 				const extFiles = ['png', 'jpg', 'jpeg'];
 				let nextSibling = e.target.nextElementSibling;
 
@@ -54,36 +69,55 @@ var FOTOS = {
 					// Habilito boton de subir foto
 					document.getElementById("btnAgregarFoto").disabled = false;
 				} else {
-					toastr.error("Error Tipo de Archivo", "Debe subir una imagen !!");
+					toastr.error("Error Tipo de Archivo", "Debe seleccionar una imagen !!");
 				}
 		});
 		return null;
 	},
 
 	// Evento click de las imagenes
-	clickEnImagen: () => {
-		$('img.img-thumbnail').click(function (e) {
+	eventoClickEnImagen: () => {
+		$('img.img-fluid').click(function (e) {
 			const urlImg = e.target.src;
-			const nombreImg = FOTOS.getNombreImagen(e.target.src);
-
-			//const varHref = "borrarImg.php?img=" + $(this).next("span").attr("data-nom");
+			const nombreImg = $(this).attr('data-nombre');
 
 	        $(".tituloModal").text(nombreImg);
         	$("#imgMod").attr("src", urlImg);
         	//$("a#btnBorrar").prop("href", varHref);
 		 	$('#verImagen').modal('show');
-
-			//console.log('Imagen: ' + nombreImg);
-
 		});
 	},
 
-	guardarFoto: function () {
+	agregarFoto: function (ismobile) {
+		this.guardarFoto(ismobile);
+
+		if (FileReader) {
+			var reader = new FileReader();
+
+			const inputElem = document.getElementById('inputFoto');
+			const archivo = inputElem.files[0];
+			reader.readAsDataURL(inputElem.files[0]);
+
+			reader.onload = function (e) {
+				let image = new Image();
+				image.src = e.target.result;
+
+				image.onload = function () {
+					FOTOS.agregarFotoADisplay(ismobile, image);
+				};
+			}
+		} else {
+		    console.log('Error al cargar la foto !!');
+		}
+	},
+
+	guardarFoto: function (ismobile) {
 		const formElem = document.getElementById("form_foto"); //document.querySelector("form_foto");
 		const formData = new FormData(formElem);
+		formData.append('idPresup', PRESUP.id_presup);
+
 		const options  = {
 			method: 'POST',
-			//mode: 'cors',
 			body: formData
 		}
 		const req = new Request(PRESUP.pathGuardarFoto, options);
@@ -98,42 +132,59 @@ var FOTOS = {
 			})
 			.then( (data) => {
 				// Si todo está Ok, data es un json
-				console.log(data);
-				FOTOS.agregarFotoADisplay();
+				console.log('Data foto:', data);
 			})
 			.catch( (err) => {
 				console.log('ERROR: ', err.message);
 				toastr.error("Error al guardar foto", "Error al guardar datos !!");
-			});
+		});
 	},
 
-	agregarFotoADisplay: function () {
-
-		const inputElem = document.getElementById('inputFoto');
-		// Obtengo nombre del archivo del input
-		const file = inputElem.files[0];
-	    // Create a new URL that references to the file
-	    const url = URL.createObjectURL(file);
-
-	    this.crearDivConFoto(url);
+	agregarFotoADisplay: function (ismobile, image) {
+		const inputElem = document.getElementById('inputFoto');    // Input de foto
+		//const file = inputElem.files[0];	// Create a new URL that references to the file
+	    //const url = URL.createObjectURL(file);
+	    const nombreImg = this.getNombreImagen(inputElem.value);
+	    this.crearDivConFoto(nombreImg, ismobile, image);
 	    // Desabilito boton de agregar
 	    document.getElementById("btnAgregarFoto").disabled = true; 
 	    // Borro nombre de la foto del input
 	    let inputFoto = document.querySelector('.custom-file-input');
 	    let nextSibling = inputFoto.nextElementSibling;
 		nextSibling.innerText = 'Seleccionar Archivo';
-		this.clickEnImagen();
+		this.eventoClickEnImagen();
+		// Nuevas fotos ven en otro array por si no guarda el documento
+		PRESUP.nuevasFotos.push(nombreImg);
 
 		return null;
 	},
 
 	getNombreImagen: name => {
-		const lastBar = name.lastIndexOf('/');
+		const lastBar = name.lastIndexOf('\\');
 		const imagen = name.substring(lastBar + 1);
 
 		return imagen;
 	},
 
-};
+	borrar: async (fotos, url) => {
+		const files = { files: fotos };
+		// OJO - Va a faltar el csrf !!
+		const options = {
+			method: 'POST',
+			body: JSON.stringify(files),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		};
+
+		const res = await fetch(url, options);
+		const data = await res.json();
+
+console.log('Borrando...');
+
+		return data;
+	},
+
+}
 
 export { FOTOS };

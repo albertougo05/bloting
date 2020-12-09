@@ -25,20 +25,21 @@
 				<hr class="mt-3 mb-1" />
 
 				{# FORMULARIO #}
-				<form id="formPresup">
+				<form id="form_comprob">
 					{# Para CSRF control #}
 					{{ csrf.field | raw }}
-
-					<input type="hidden" name="id_presup" id="id_presup">
+					<input type="hidden" name="id" id="id">
+					<input type="hidden" name="nroComprobante" id="nroComprobante">
 					<input type="hidden" name="id_cliente" id="id_cliente" value="0">
+					<input type="hidden" name="importe" id="importe">
 
 					<div class="row">
 						{# SUCURSAL #}
 						<div class="col-sm-1 offset-sm-1 mt-3 col-label">
-							<label class="lblPresup" for="sucursal">Sucursal</label>
+							<label class="lblPresup" for="idSucursal">Sucursal</label>
 						</div>		
 						<div class="col-sm-3 mt-3">
-							<select class="form-control form-control-sm" id="sucursal" name="sucursal">
+							<select class="form-control form-control-sm" id="idSucursal" name="idSucursal">
 								{% for suc in sucursales %}
 									<option value="{{ suc.id }}">{{ suc.localidad }} ({{ suc.nroSucursal }})</option>
 								{% endfor %}
@@ -53,10 +54,10 @@
 						</div>
 						{# ID PRESUPUESTO #}
 						<div class="col-sm-1 mt-3 col-label">
-							<label class="lblPresup" for="id_presup_pant">ID</label>			
+							<label class="lblPresup" for="idComprobPant">ID</label>			
 						</div>
 						<div class="col-sm-1 mt-3">
-							<input type="text" class="form-control form-control-sm text-right" id="id_presup_pant" name="id_presup_pant" disabled="true">
+							<input type="text" class="form-control form-control-sm text-right" id="idComprobPant" name="idComprobPant" disabled="true">
 						</div>
 
 					</div>
@@ -77,10 +78,10 @@
 						</div>
 						{# ESTADO (Estado) #}
 						<div class="col-sm-1 offset-md-2 mt-2 col-label">
-							<label class="lblPresup" for="estado">Estado</label>
+							<label class="lblPresup" for="idEstado">Estado</label>
 						</div>		
 						<div class="col-sm-3 mt-2">
-							<select class="form-control form-control-sm" id="estado" name="estado">
+							<select class="form-control form-control-sm" id="idEstado" name="idEstado">
 								{% for estado in estadosCompr %}
 									<option value="{{ estado.id }}">{{ estado.descripcion }}</option>
 								{% endfor %}
@@ -92,18 +93,18 @@
 						<div class="d-flex">
 							{# FECHA ULTIMA MODIFICACION #}
 							<div class="col-sm-2 mt-2 col-label">
-								<label class="lblPresup" for="fechaUltModif">Modificado</label>
+								<label class="lblPresup" for="fechaUltimoCambio">Modificado</label>
 							</div>
 							<div class="col-sm-3 mt-2">
-							    <input type="date" class="form-control form-control-sm" id="fechaUltModif" name="fechaUltModif" disabled>
+							    <input type="date" class="form-control form-control-sm" id="fechaUltimoCambio" name="fechaUltimoCambio" disabled>
 							</div>
 
 							{# FECHA ANULACION #}
 							<div class="col-sm-3 mt-2 col-label">
-								<label class="lblPresup" for="fechaAnulac">Anulado</label>
+								<label class="lblPresup" for="fechaAnulaoElimina">Anulado</label>
 							</div>
 							<div class="col-sm-3 mt-2">
-							    <input type="date" class="form-control form-control-sm" id="fechaAnulac" name="fechaAnulac" disabled>
+							    <input type="date" class="form-control form-control-sm" id="fechaAnulaoElimina" name="fechaAnulaoElimina" disabled>
 							</div>
 						</div>
 					</div>
@@ -160,7 +161,7 @@
 							</div>
 							{# PAIS #}
 							<div class="col-sm-1 mt-2 col-label">
-								<label class="lblPresup" for="PAIS">País</label>			
+								<label class="lblPresup" for="pais">País</label>			
 							</div>
 							<div class="col-sm-2 mt-2">
 								<select class="form-control form-control-sm" id="pais" name="pais">
@@ -223,9 +224,9 @@
 
 				</form>  {# /form #}
 
-				<div class="row">
+				<div class="row" id="etiquetas">
 					<div class="col">
-						<hr>
+						<hr />
 					</div>
 				</div>
 
@@ -244,6 +245,9 @@
 							</li>
 							<li class="nav-item">
 								<a class="nav-link btn-pills" id="pills-fotos-tab" data-toggle="pill" href="#pills-fotos" role="tab" aria-controls="pills-fotos" aria-selected="false">Ingreso Fotos</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link btn-pills" id="pills-extras-tab" data-toggle="pill" href="#pills-extras" role="tab" aria-controls="pills-extras" aria-selected="false">Extras</a>
 							</li>
 						</ul>
 						<div class="tab-content" id="pills-tabContent">
@@ -265,6 +269,11 @@
 							<div class="tab-pane fade" id="pills-fotos" role="tabpanel" aria-labelledby="pills-fotos-tab">
 
 								{% include 'presupuesto/tab_fotos.twig' %}
+
+							</div>
+							<div class="tab-pane fade" id="pills-extras" role="tabpanel" aria-labelledby="pills-extras-tab">
+
+								{% include 'presupuesto/tab_extras.twig' %}
 
 							</div>
 						</div>
@@ -319,7 +328,6 @@
 {% block javascript %}
 	{{ parent() }}
 
-
 	<script src="{{ base_url() }}/js/jquery.inputmask.bundle.min.js"></script>
 	<script src="{{ base_url() }}/js/toastr.min.js"></script>
 	<script src="{{ base_url() }}/js/jquery-confirm.min.js"></script>
@@ -329,17 +337,34 @@
     	// Paths
     	var PRESUP = {
     	    pathGuardar:      "{{ path_for('presupuesto.guardar') }}",
+    	    pathGuardarRegist:"{{ path_for('presupuesto.guardarregistro') }}",
+    	    pathGuardarPresup:"{{ path_for('presupuesto.guardarpresupuesto') }}",
+    	    pathGuardarAmbien:"{{ path_for('presupuesto.guardarambiente') }}",
+    	    pathGuardarProduc:"{{ path_for('presupuesto.guardarproductos') }}",
+
     	    pathPresup:       "{{ path_for('presupuesto') }}",
     	    pathPresupBuscar: "{{ path_for('presupuesto.buscar') }}",
-    	    pathGetPresup:    "{{ path_for('presupuesto.getpresup') }}",
+
+    	    pathGetComprob:   "{{ path_for('presupuesto.getcomprobante', {id: ''}) }}",
+    	    pathGetRegistro:  "{{ path_for('presupuesto.getregistro', {id: ''}) }}",
+    	    pathGetPresupuesto:"{{ path_for('presupuesto.getpresupuesto', {id: ''}) }}",
+    	    pathGetAmbientes:  "{{ path_for('presupuesto.getambientes', {id: ''}) }}",
+    	    pathGetProductos:   "{{ path_for('presupuesto.getproductos', {id: ''}) }}",
+
     	    pathImprimir:     "{{ path_for('presupuesto.imprimir') }}",
-    	    pathBuscarCliente: "{{ path_for('cliente.buscar') }}",
+    	    pathBuscarCliente:"{{ path_for('cliente.buscar') }}",
     	    pathGetCliente:   "{{ path_for('cliente.getcliente') }}",
     	    pathGuardarFoto:  "{{ path_for('presupuesto.guardarfoto') }}",
+    	    pathBorrarFoto:   "{{ path_for('presupuesto.borrarfoto') }}",
+    	    pathEliminaaAmb:  "{{ path_for('presupuesto.eliminaambiente', {id: ''}) }}",
     	    fecha:            "{{ fecha }}",
     	    id_presup:        "{{ id_presup }}",
+    	    isMobile:		  "{{ isMobile }}",
+    	    guardado:         false,
     	    listaDeFotos:     [],
-    	    productos: []
+    	    nuevasFotos:      [],
+    	    productos:        [],
+    	    estadosItem:      []
     	};
 
 		let obj = {};
@@ -349,11 +374,20 @@
 			obj.idTipoProd  = "{{ prod.id_TipoProducto }}";
 			obj.ancho = parseFloat( "{{ prod.ancho }}" ) || 0;
 			obj.alto = parseFloat( "{{ prod.alto }}" ) || 0;
+			obj.mts = parseFloat( "{{ prod.mts }}" ) || 0;
+			obj.precio = parseFloat( "{{ prod.precioXmt2 }}" ) || 0;
 			PRESUP.productos.push( obj );
+			obj = {};
+		{% endfor %}
+
+		{% for estado in estadosItem %}
+			obj.id = "{{ estado.id }}";
+			obj.descripcion = "{{ estado.descripcion }}";
+			PRESUP.estadosItem.push(obj);
 			obj = {};
 		{% endfor %}
 
 	</script>
 
-	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.0.9"></script>
+	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.2.9"></script>
 {% endblock %}

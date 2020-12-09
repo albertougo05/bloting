@@ -47,7 +47,6 @@ $app->group('/usuario', function () use ($app, $container) {
 	# Usuario / buscar
 	$app->get('/buscar/{id}', 'UsuarioController:buscar')->setName('usuario.buscar');
 
-
 })->add(new AuthMiddleware($container));
 
 # PRESUPUESTO
@@ -59,11 +58,32 @@ $app->group('/presupuesto', function () use ($app, $container) {
 	$app->post('/guardar', 'PresupuestoController:guardar')->setName('presupuesto.guardar');
 	# Presupuesto / buscar
 	$app->get('/buscar', 'PresupuestoController:buscar')->setName('presupuesto.buscar');
-	# Presupuesto / Existe
-	$app->get('/getpresup', 'PresupuestoController:getpresup')->setName('presupuesto.getpresup');
+	# Presupuesto / getcomprobante
+	$app->get('/getcomprobante/{id}', 'PresupuestoController:getComprobante')->setName('presupuesto.getcomprobante');
 	# Presupuesto / imprimir
 	$app->get('/imprimir', 'PresupuestoController:imprimir')->setName('presupuesto.imprimir');
 	# Presupuesto / guardarfoto
 	$app->post('/guardarfoto', 'PresupuestoController:guardarFoto')->setName('presupuesto.guardarfoto');
+	# Presupuesto / borrarfoto
+	$app->post('/borrarfoto', 'PresupuestoController:borrarFoto')->setName('presupuesto.borrarfoto');
+	# Presupuesto / guardarregistro
+	$app->post('/guardarregistro', 'PresupuestoController:guardarRegistro')->setName('presupuesto.guardarregistro');
+	# Presupuesto / getregistro
+	$app->get('/getregistro/{id}', 'PresupuestoController:getRegistro')->setName('presupuesto.getregistro');
+	# Presupuesto / guardarpresupuesto
+	$app->post('/guardarpresupuesto', 'PresupuestoController:guardarPresupuesto')->setName('presupuesto.guardarpresupuesto');
+	# Presupuesto / getpresupuesto
+	$app->get('/getpresupuesto/{id}', 'PresupuestoController:getPresupuesto')->setName('presupuesto.getpresupuesto');
+	# Presupuesto / guardarambiente
+	$app->post('/guardarambiente', 'PresupuestoController:guardarAmbiente')->setName('presupuesto.guardarambiente');
+	# Presupuesto / getambientes
+	$app->get('/getambientes/{id}', 'PresupuestoController:getAmbientes')->setName('presupuesto.getambientes');
+	# Presupuesto / eliminaambiente
+	$app->get('/eliminaambiente', 'PresupuestoController:eliminaAmbiente')->setName('presupuesto.eliminaambiente');
+	# Presupuesto / guardarproductos
+	$app->post('/guardarproductos', 'PresupuestoController:guardarProductos')->setName('presupuesto.guardarproductos');
+	# Presupuesto / getproductos
+	$app->get('/getproductos/{id}', 'PresupuestoController:getProductos')->setName('presupuesto.getproductos');
+
 
 })->add(new AuthMiddleware($container));

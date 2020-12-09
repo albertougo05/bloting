@@ -1,14 +1,14 @@
 	<div class="row">
 		<div class="col mt-3">
-			<form action="{{ path_for('presupuesto.guardarfoto') }}" method="POST" enctype="multipart/form-data" id="form_foto">
+			<form id="form_foto">
 				{# Para CSRF control #}
 				{{ csrf.field | raw }}
-				<input type="hidden" name="idPresup" id="idPresup" value="0" />
-				<div class="custom-file lang="es"">
+
+				<div class="custom-file" lang="es">
 					<input type="file" class="form-control form-control-sm custom-file-input" id="inputFoto" name="inputFoto" lang="es" />
 					<label class="custom-file-label lblPresup" for="inputFoto">Seleccionar Archivo</label>
 				</div>
-				<button id="btnAgregarFoto" type="submit" class="btn btn-sm btn-success mt-1" disabled>Agregar Foto</button>
+				<button id="btnAgregarFoto" type="button" class="btn btn-sm btn-success mt-1" disabled>Agregar Foto</button>
 			</form>
 		</div>
 	</div>
@@ -19,4 +19,13 @@
 		</div>
 	</div>
 
-	<div class="row p-4" id="fotosContainer"></div>	
+	<div id="fotosContainer"></div>
+
+	<div class="d-flex justify-content-center mb-3">
+		<button id="btnGuardarFotos" 
+				onclick="PRESUP.onClickBtnGuardarFotos();"
+				type="button" 
+				class="btn btn-sm btn-success">
+			Guardar Fotos
+		</button>
+	</div>

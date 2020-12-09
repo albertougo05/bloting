@@ -58,19 +58,19 @@ $container['view'] = function ($container) {
     return $view;
 };
 
-
-// Csrf (Modificado par que exceptue la ruta: presupuesto.guardarfoto)
 //$container['csrf'] = function ($container) {
     
 //    return new \Slim\Csrf\Guard;
 //};
 
+// Csrf (Modificado para que exceptue la ruta: presupuesto.guardarfoto y presupuesto.borrarfoto)
+/**
 $container['csrf'] = function($container) {
     $guard = new \Slim\Csrf\Guard;
     $guard->setFailureCallable(function($request, $response, $next) use ($container) {
         $request = $request->withAttribute("csrf_status", false);
         if( $request->getAttribute('csrf_status') === false ) {
-            if( $request->getAttribute('route')->getName() === 'presupuesto.guardarfoto') {
+            if( $request->getAttribute('route')->getName() === 'presupuesto.guardarfoto' ) {
                 return $next($request, $response);
             }
                 return $response->withStatus(400)->withRedirect($container['router']->pathFor('home'));
@@ -80,6 +80,16 @@ $container['csrf'] = function($container) {
 });
     return $guard;
 };
+*/
+
+// Csrf - Modificado para que se pueda recibir varios post con el mismo token
+$container["csrf"] = function ($container) {
+    $guard = new \Slim\Csrf\Guard();
+    $guard->setPersistentTokenMode(true);
+    return $guard;
+};
+
+
 
 // PDO
 $container['pdo'] = function ($container) {
