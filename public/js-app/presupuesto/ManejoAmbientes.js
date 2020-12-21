@@ -72,12 +72,15 @@ class ManejoAmbientes {
 	}
 
 	eliminarAmbienteYProdsDelDisco(url, idpresup) {
-		const ambsEliminados = this.ambientes = this.ambientes.filter(amb => {		// Filtrar ambientes borrados
+		const ambsEliminados =  this.ambientes.filter(amb => {		// Filtrar ambientes borrados
 			return amb.eliminado === true;
 		});
 
 		// Si no hay ambientes eliminados, retorna
-		if (ambsEliminados === []) return null;
+		if (ambsEliminados.length === 0) {
+			//console.log('NO hay ambientes eliminados.');
+			return null;
+		}
 
 		ambsEliminados.forEach( amb => {
 			const idamb = amb.idAmb;
@@ -121,26 +124,29 @@ class ManejoAmbientes {
         const options = { method: 'POST',
                           body: formData };
 
-        const res = await fetch(url, options);
+		const res = await fetch(url, options);
 		const data = await res.json();
-
-        console.log('Status guardar ambientes:', data);
+        //console.log('Status guardar ambientes:', data);
 	}
 
-	async buscarAmbientes(id, url) {
+	buscarAmbientes(id, url) {
 		const endPoint = url + id;
 		const data = fetchData.obtener(endPoint);
 
-		await data.then( resp => {
-
-			resp.forEach( (amb, idx) => {
-				if(idx > 0) {
-					this.crearAmbiente();
-					this.mostrarNuevoAmbiente();
-				}
-				this.setAmbiente(idx, amb);
-				this.cargarDataEnAmb(amb);
-			});
+		data.then( resp => {
+			if (resp.status) {
+				//console.log(resp);
+				return null;
+			} else {
+				resp.forEach( (amb, idx) => {
+					if(idx > 0) {
+						this.crearAmbiente();
+						this.mostrarNuevoAmbiente();
+					}
+					this.setAmbiente(idx, amb);
+					this.cargarDataEnAmb(amb);
+				});
+			}
 		});
 	}
 
@@ -152,12 +158,10 @@ class ManejoAmbientes {
 
 	async enviarPeticion(url) {
 		const response = await fetch(url);
-
 		if (!response.ok) {    
 			const message = `Un error ha occurrido: ${response.status}`;    
 			throw new Error(message);  
 		}
-
 		const data = await response.json();
 
 		return data;
@@ -274,6 +278,7 @@ class CreaHtml {
 		      		<div class="card-body">
 	      				<div class="row">
 	      					<div class="col ml-1 mr-1 mb-2">
+	      						<label class="lblPresup mt-0 mb-0" for="conceptoAmbiente-${idx}">Concepto</label>
 	      						<textarea id="conceptoAmbiente-${idx}" class="form-control form-control-sm concepto" placeholder="Conceptos ambiente ${idx}" rows="1"></textarea>
 	      					</div>
 	      				</div>`;

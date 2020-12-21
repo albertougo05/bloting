@@ -1,13 +1,13 @@
 import { buscarCliente } from './buscarCliente.js';
-import { FOTOS } from './guardarFotos.js';
+import { FOTOS } from './manejoFotos.js';
 import ManejoAmbientes from './ManejoAmbientes.js';
 import IngresoProds from './IngresoProds.js';
 import guardarComprob from './guardarComprob.js';
 import buscarComprobante from './buscarComprobante.js';
 import buscarRegistro from './buscarRegistro.js';
 import buscarPresupuesto from './buscarPresup.js';
-
-
+import buscarOrdenTrabajo from './buscarOrdenTrabajo.js';
+import uiDeExtras from './uiDeExtras.js';
 
 //
 // presupuesto.js
@@ -166,39 +166,84 @@ PRESUP._updateMedidas = function (medidas) {		// medidas = {totalMts2Revest, tot
  */
 PRESUP.onClickBtnGuardarRegistro = function () {
 	guardarComprob.salvarRegistro(PRESUP.pathGuardarRegist);
+	PRESUP.guardadoDeTabs.registro = true;
 }
 
 /**
  * CLICK GUARDAR TAB PRESUPUESTO
  */
 PRESUP.onClickBtnSalvarPresup = function () {
-	//const guardaOk = guardarComprob.salvarPresup(PRESUP.pathGuardarPresup);
+	const guardaOk = guardarComprob.salvarPresup(PRESUP.pathGuardarPresup);
 
-	//if (guardaOk) {		// Salvar ambientes y sus productos
+	if (guardaOk) {		// Salvar ambientes y sus productos
 		// Eliminar productos y ambientes eliminados
-		PRESUP._ambientes.eliminarAmbienteYProdsDelDisco(PRESUP.pathEliminaaAmb, PRESUP.id_presup);
-	//	PRESUP._ambientes.salvarAmbientes(PRESUP.pathGuardarAmbien, PRESUP.id_presup);
-		//PRESUP._ingresoProds.salvarProductosDeAmbientes(PRESUP.pathGuardarProduc, PRESUP.id_presup);
-	//} else { 
-	//	toastr.error('No se guardó presupuesto !', "ERROR, intente cerrar la aplicación !"); 
-	//}
+		PRESUP._ambientes.eliminarAmbienteYProdsDelDisco(PRESUP.pathEliminaAmb, PRESUP.id_presup);
+		PRESUP._ambientes.salvarAmbientes(PRESUP.pathGuardarAmbien, PRESUP.id_presup);
+		PRESUP._ingresoProds.salvarProductosDeAmbientes(PRESUP.pathGuardarProduc, PRESUP.id_presup);
+		PRESUP.guardadoDeTabs.presupuesto = true;
+	} else { 
+		toastr.error('No se guardó presupuesto !', "ERROR, intente cerrar la aplicación !"); 
+	}
 }
 
 /**
  * CLICK GUARDAR TAB ORDEN DE TRABAJO
  */
 PRESUP.onClickBtnGuardarOrdenT = function () {
-	guardarComprob.salvarOrdenT();
+	guardarComprob.salvarOrdenTrab( 
+		PRESUP.pathGuardarOrdTrab, 
+		PRESUP.id_presup
+	);
+	PRESUP.guardadoDeTabs.ordenTrabajo = true;
 }
 
 /**
  * CLICK GUARDAR TAB FOTOS
  */
 PRESUP.onClickBtnGuardarFotos = function () {
-	guardarComprob.salvarFotos(PRESUP.listaDeFotos);
+	guardarComprob.salvarFotos(
+		PRESUP.listaDeFotos, 
+		PRESUP.pathGuardarListaFotos,
+		PRESUP.id_presup
+	);
+	PRESUP.guardadoDeTabs.fotos = true;
 }
 
+/**
+ * CLICK GUARDAR TAB EXTRAS
+ */
+PRESUP.onClickBtnGuardarExtras = function () {
+	guardarComprob.salvarExtras(
+		PRESUP.listaDeExtras, 
+		PRESUP.pathGuardarExtras,
+		PRESUP.id_presup
+	);
+}
 
+/**
+ * CLICK BOTON AGREGAR EXTRA
+ */
+PRESUP.onClickBtnAgregarExtra = function () {
+	const desc = document.getElementById('descripcionExtras').value;
+	const impo = COMMONS.realParseFloat(document.getElementById('importeExtra').value);
+
+	if (desc.trim() != '') {
+		const obj  = { descripcion: desc, importe: impo };
+		this.listaDeExtras.push(obj);
+		uiDeExtras.ingresoTabla(obj, this.listaDeExtras.length);
+	}
+}
+
+/**
+ * CLICK BOTON BORRAR EXTRA
+ */
+PRESUP.onClickBtnBorrarExtra = function (btn) {
+	const btnIndex = btn.parentNode.parentNode.rowIndex;
+    document.getElementById('tablaExtras').deleteRow(btnIndex);
+    const idx = parseInt( btn.getAttribute('data-idx') );
+    this.listaDeExtras.splice(idx, 1);
+    document.getElementById('descripcionExtras').focus();
+}
 
 
 /**
@@ -262,15 +307,16 @@ PRESUP.winBuscarPresup = function () {		// Crea ventana para buscar presupuesto 
 				this.close();
 				PRESUP.winBuscar = false;
 				PRESUP.guardado = true;		// Para permitir guardar Tabs
+
 				buscarComprobante(idPresup, PRESUP.pathGetComprob);
 				PRESUP.id_presup = idPresup;	// Set el id del comprobante
 				buscarRegistro(idPresup, PRESUP.pathGetRegistro);
 				buscarPresupuesto(idPresup, PRESUP.pathGetPresupuesto);
 				PRESUP._ambientes.buscarAmbientes(idPresup, PRESUP.pathGetAmbientes);
 				PRESUP._ingresoProds.buscarProductos(idPresup, PRESUP.pathGetProductos);
-				// buscarOrdenTrab()
-				// buscarFotos()
-				// buscarExtras()
+				buscarOrdenTrabajo(idPresup, PRESUP.pathGetOrdenTrab);
+				FOTOS.buscarFotos(idPresup, PRESUP.pathGetFotos, PRESUP.isMobile);
+				uiDeExtras.buscarExtras(idPresup, PRESUP.pathGetExtras);
 			}
 		});
 		this.objWinBuscar.addEventListener("beforeunload", function (e) {
@@ -297,11 +343,21 @@ $( function () {
         groupSeparator: ".",
         digits: 2,
         autoGroup: true,
-        //prefix: '$ ', //Space after $, this will not truncate the first character.
         rightAlign: false,
         unmaskAsNumber: true, 
         allowPlus: false,
     	allowMinus: false,
+        oncleared: function () { self.value = ''; }
+    });
+
+	// Inicializa input importe de extras y entrega en tab presupuesto
+    $('input#importeExtra, input#entrega').inputmask("numeric", {
+        radixPoint: ",",
+        groupSeparator: ".",
+        digits: 2,
+        autoGroup: true,
+        rightAlign: false,
+        unmaskAsNumber: true, 
         oncleared: function () { self.value = ''; }
     });
 
@@ -360,27 +416,17 @@ $( function () {
 
 	// Focus on Fecha
 	$('#fecha').focus();
+
 	// Inicializa tooltips
 	$('[data-toggle="tooltip"]').tooltip();
-
-	// Inicializa input importe
-    $('input#importe, input#entrega').inputmask("numeric", {
-        radixPoint: ",",
-        groupSeparator: ".",
-        digits: 2,
-        autoGroup: true,
-        //prefix: '$ ', //Space after $, this will not truncate the first character.
-        rightAlign: false,
-        unmaskAsNumber: true, 
-        oncleared: function () { self.value = ''; }
-    });
 
 	// Click en botones Confirma y Guardar
 	$('#btnConfirma, a#guardar').click( function(e) {
 
 		if ( guardarComprob.validarComprob() ) {
 			$('#spinnerGuardar').show();
-			guardarComprob.salvarComprob(PRESUP.pathGuardar);
+			guardarComprob.establecerEstadoComprob();
+			guardarComprob.salvarComprob(PRESUP.pathGuardar, PRESUP.guardadoDeTabs);
 		}
 
 		return null;
@@ -498,9 +544,6 @@ $( function () {
 		}
 	});
 
-	// Evento onChange select de tabla de productos
-	$('select ')
-
 	// Evento antes de cerrar la ventana
 	$(window).on("beforeunload", function(e)
 	{
@@ -517,5 +560,6 @@ $( function () {
 		//  	});
 		// }
 	});
+
 
 });

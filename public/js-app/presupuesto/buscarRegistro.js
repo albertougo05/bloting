@@ -10,8 +10,12 @@ function buscarRegistro(id, url) {
 	const data = fetchData.obtener(endPoint);
 
 	data.then( resp => {
-		//console.log(resp);
-		_mostrarRegistro(resp);
+		if (resp.status) {
+			//console.log(resp);
+			return null;
+		} else {
+			_mostrarRegistro(resp);
+		}
 	});
 }
 

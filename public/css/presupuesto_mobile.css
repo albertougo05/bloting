@@ -78,7 +78,7 @@ table#tableModal {
 .modal-content {
 	background-color: #FFF0F5;
 }
-#btnCollapseRegistro, #btnCollapsePresup, #btnCollapseOrden, #btnCollapseFotos{
+#btnCollapseRegistro, #btnCollapsePresup, #btnCollapseOrden, #btnCollapseFotos, #btnCollapseExtras{
 	width: 150px;
 }
 .card-body > p {
@@ -88,4 +88,6 @@ table#tableModal {
 	border: none;
 	background: #faf4ee;
 }
-
+#btnAgregaExtra {
+	margin-top: 28px;
+}

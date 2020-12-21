@@ -95,8 +95,16 @@ var COMMONS = {
           s = s.replace(/,/g, ''); // strip out commas
           return parseFloat(s); // convert to number
       }
-  }
+  },
 
+  currencyFormat: function (num) {
+    return (
+        num
+          .toFixed(2) // always two decimal digits
+          .replace('.', ',') // replace decimal point character with ,
+          .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+    ) // use . as a separator
+  }
 
 
 };

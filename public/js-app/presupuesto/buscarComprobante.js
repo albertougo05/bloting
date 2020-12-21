@@ -23,9 +23,10 @@ let _datosAlFormulario = function (data) {
 	$('input#fechaAnulaoElimina').val(data.fechaAnulaoElimina);
 	$('input#fechaUltimoCambio').val(data.fechaUltimoCambio);
 	$('select#idEstado').val(data.idEstado).change();;
-	$('select#idSucursal').val(data.idSucursal).change();;
+	$('select#idSucursal').val(data.idSucursal).change();
 	$('input#nroComprobante').val(data.nroComprobante);
 	$('input#idComprobPant').val(data.nroComprobante);
+	$('select#idTipoComprobante').val(data.idTipoComprobante).change();
 	$('input#id_cliente').val(data.id);
 	$('input#nombre').val(data.nombre);
 	$('input#domicilio').val(data.domicilio);

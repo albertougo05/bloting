@@ -66,6 +66,11 @@ $app->group('/presupuesto', function () use ($app, $container) {
 	$app->post('/guardarfoto', 'PresupuestoController:guardarFoto')->setName('presupuesto.guardarfoto');
 	# Presupuesto / borrarfoto
 	$app->post('/borrarfoto', 'PresupuestoController:borrarFoto')->setName('presupuesto.borrarfoto');
+	# Presupuesto / guardarlistafotos
+	$app->post('/guardarlistafotos', 'PresupuestoController:guardarListaFotos')->setName('presupuesto.guardarlistafotos');
+	# Presupuesto / getfotos
+	$app->get('/getfotos/{id}', 'PresupuestoController:getFotos')->setName('presupuesto.getfotos');
+
 	# Presupuesto / guardarregistro
 	$app->post('/guardarregistro', 'PresupuestoController:guardarRegistro')->setName('presupuesto.guardarregistro');
 	# Presupuesto / getregistro
@@ -84,6 +89,13 @@ $app->group('/presupuesto', function () use ($app, $container) {
 	$app->post('/guardarproductos', 'PresupuestoController:guardarProductos')->setName('presupuesto.guardarproductos');
 	# Presupuesto / getproductos
 	$app->get('/getproductos/{id}', 'PresupuestoController:getProductos')->setName('presupuesto.getproductos');
-
+	# Presupuesto / guardarordentrab
+	$app->post('/guardarordentrab', 'PresupuestoController:guardarOrdenTrab')->setName('presupuesto.guardarordentrab');
+	# Presupuesto / getordentrabajo
+	$app->get('/getordentrabajo/{id}', 'PresupuestoController:getOrdenTrabajo')->setName('presupuesto.getordentrabajo');
+	# Presupuesto / guardarextras
+	$app->post('/guardarextras', 'PresupuestoController:guardarExtras')->setName('presupuesto.guardarextras');
+	# Presupuesto / getextras
+	$app->get('/getextras/{id}', 'PresupuestoController:getExtras')->setName('presupuesto.getextras');
 
 })->add(new AuthMiddleware($container));

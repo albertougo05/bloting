@@ -113,3 +113,6 @@ button:disabled {
   cursor: not-allowed;
   pointer-events: none !important;
 }
+#btnAgregaExtra {
+	margin-top: 34px;
+}

@@ -9,12 +9,13 @@ function buscarPresupuesto(id, url) {
 	const data = fetchData.obtener(endPoint);
 
 	data.then( resp => {
-		//console.log('Hay datos presupuesto...');
-		_mostrarPresupuesto(resp);
+		if (resp.status) {
+			//console.log(resp);
+			return null;
+		} else {
+			_mostrarPresupuesto(resp);
+		}
 	});
-
-	// Buscar datos Ambientes...
-
 }
 
 export default buscarPresupuesto;
@@ -31,6 +32,6 @@ const _mostrarPresupuesto = data => {
 	form2.querySelector('input#totalMts2Cielorraso').value = data.totalMts2Cielorraso;
 	form2.querySelector('input#totalMtsMolduras').value = data.totalMtsMolduras;
 	form2.querySelector('input#importePresup').value = data.importePresup;
-	form2.querySelector('textarea#formaDePago').value = data.formaDePago;
+	form2.querySelector('textarea#formaDePago').value = data.formaDePago || '';
 	form2.querySelector('input#entrega').value = data.entrega;
 }

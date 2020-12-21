@@ -204,7 +204,7 @@ class IngresoProds {
 				idComprobante: idcomp,
 				productos: this.productosSelecEnAmbiente
 			};
-			console.log(this.productosSelecEnAmbiente);
+			//console.log(this.productosSelecEnAmbiente);
 			datos = JSON.stringify(datos);
 
 	        const options = { method: 'POST',
@@ -214,23 +214,22 @@ class IngresoProds {
 
 	        const res = await fetch(url, options);
 			const data = await res.json();
-	        console.log('Status guardar ambientes:', data);
+	        //console.log('Status guardar ambientes:', data);
 	    }
 	    return null;
 	}
 
-	async buscarProductos(id, url) {
+	buscarProductos(id, url) {
 		const endPoint = url + id;
+
 		const data = fetchData.obtener(endPoint);
 
-		await data.then( resp => {
-
-			if (resp && resp.status) {
-				console.log(resp.status);
+		data.then( resp => {
+			//console.log('Productos:', resp);
+			if (resp.status) {		// Si devuelve status, es que NO hay productos
+				console.log(resp);
+				return null;
 			} else {
-
-//console.log('Productos:', resp);
-
 				resp.forEach( (prod, idx) => {
 					delete prod.created_at;		//	Elimino propiedades no necesarias
 					delete prod.updated_at;		// idem
@@ -350,11 +349,13 @@ class UiTablaProductos {
 
 	insertarProd(obj, idx) {
 		const idElem = `idBodyTablaProds-${idx}`;
-		const body = document.getElementById(idElem);
+		const elem = document.getElementById(idElem);
 		// Armo la linea
 		const linea = this.__lineaProd(obj);
-		// Inserto linea en tabla
-		body.appendChild(linea);
+		if (elem) {
+			// Inserto linea en tabla
+			elem.appendChild(linea);
+		}
 	}
 
 	__lineaProd(objProd) {

@@ -16,6 +16,9 @@ use App\Models\RegistroVisita;
 use App\Models\Presupuesto;
 use App\Models\Ambiente;
 use App\Models\ProductoAmbiente;
+use App\Models\OrdenTrabajo;
+use App\Models\Foto;
+use App\Models\Extra;
 
 use App\Controllers\Controller;
 
@@ -241,12 +244,83 @@ class PresupuestoController extends Controller
 									->get()
 									->toArray();
 		if ($registros == []) {
-			$registros = ['status' => 'No hay registros'];
+			$registros = ['status' => 'No hay productos'];
 		}
 
 		return json_encode($registros);
 	}
 
+	/**
+	 * Devuelve json con datos de orden de trabajo
+	 * Name: presupuesto.getordentrabajo/{id}
+	 * 
+	 * @param  Request $request
+	 * @param  Response $response
+	 * @param  array $args
+	 * @return json
+	 */
+	public function getOrdenTrabajo($request, $response, $args)
+	{
+		$id = $args['id'];
+		$id = filter_var( $id, FILTER_SANITIZE_NUMBER_INT );
+		$registro = OrdenTrabajo::where( 'idComprobante', $id )
+								->first();
+		if ($registro) {
+			$registro = $registro->toArray();
+		} else {
+			$registro = ['status' => 'No hay orden de trabajo'];
+		}
+
+		return json_encode($registro);
+	}
+
+	/**
+	 * Devuelve json con nombres de fotos
+	 * Name: presupuesto.getfotos/{id}
+	 * 
+	 * @param  Request $request
+	 * @param  Response $response
+	 * @param  array $args
+	 * @return json
+	 */
+	public function getFotos($request, $response, $args)
+	{
+		$id = $args['id'];
+		$id = filter_var( $id, FILTER_SANITIZE_NUMBER_INT );
+		$registro = Foto::where( 'idComprobante', $id )
+						->get();
+		if ($registro) {
+			$registro = $registro->toArray();
+		} else {
+			$registro = ['status' => 'No hay fotos'];
+		}
+
+		return json_encode($registro);
+	}
+
+	/**
+	 * Devuelve json con datos extras
+	 * Name: presupuesto.getextras/{id}
+	 * 
+	 * @param  Request $request
+	 * @param  Response $response
+	 * @param  array $args
+	 * @return json
+	 */
+	public function getExtras($request, $response, $args)
+	{
+		$id = $args['id'];
+		$id = filter_var( $id, FILTER_SANITIZE_NUMBER_INT );
+		$registro = Extra::where( 'idComprobante', $id )
+						->get();
+		if ($registro) {
+			$registro = $registro->toArray();
+		} else {
+			$registro = ['status' => 'No hay extras'];
+		}
+
+		return json_encode($registro);
+	}
 
 	/**
 	 * Imprime presupuesto por id
@@ -281,7 +355,6 @@ class PresupuestoController extends Controller
 	public function guardarFoto($request, $response)
 	{
 		$result = ['status' => 'error'];
-		$idPresup = $request->getParam('idPresup');
 		$files = $request->getUploadedFiles();
 
 	    if (empty($files['inputFoto'])) {
@@ -297,6 +370,32 @@ class PresupuestoController extends Controller
 			$nuevoNombreImg = preg_replace('/ /', '_', $uploadFileName);
 		    $newfile->moveTo("./uploads/$uploadFileName");
 		    $result = ['status' => 'ok', 'filename' => $nuevoNombreImg];
+		}
+
+		return json_encode($result);
+	}
+
+	/**
+	 * Guardar lista de fotos (POST)
+	 * Name: presupuesto.guardarlistafotos
+	 *
+	 * @param  Request $request
+	 * @param  Response $response
+	 * @return json
+	 */
+	public function guardarListaFotos($request, $response)
+	{
+		$result = ['status' => 'error'];
+		$data = $this->_dataFotos($request);
+
+		Foto::where('idComprobante', $request->getParam('idComprobante'))->delete();
+
+		foreach ($data as $value) {
+			$foto = Foto::create($value);
+		}
+
+		if ($foto) {
+			$result['status'] = 'ok';
 		}
 
 		return json_encode($result);
@@ -355,13 +454,13 @@ class PresupuestoController extends Controller
 	public function guardarAmbiente($request, $response)
 	{
 		$result = ['status' => 'error'];
-		$idComprobante = $request->getParam('idComprobante');
 		$data = $this->_dataAmbientes($request);
 
 		foreach ($data as $value) {
 			$amb = Ambiente::lockForUpdate()
-							->updateOrInsert(['idComprobante' => $request->getParam('idComprobante'),
-											   'idAmbiente' => $value['idAmb'] ], $value );
+							->updateOrInsert([ 'idComprobante' => $request->getParam('idComprobante'),
+											   'idAmbiente' => $value['idAmbiente'] ], 
+											   $value );
 		}
 
 		if ($amb) {
@@ -382,8 +481,6 @@ class PresupuestoController extends Controller
 	public function guardarProductos($request, $response)
 	{
 		$result = ['status' => 'error'];
-		$idComprobante = $request->getParam('idComprobante');
-
 		$data = $this->_dataProductos($request);
 
 		foreach ($data as $value) {
@@ -401,6 +498,57 @@ class PresupuestoController extends Controller
 
 		return json_encode($result);
 	}
+
+	/**
+	 * Guardar Tab Orden de Trabajo (POST)
+	 * Name: presupuesto.guardarordentrab
+	 *
+	 * @param  Request $request
+	 * @param  Response $response
+	 * @return json
+	 */
+	public function guardarOrdenTrab($request, $response)
+	{
+		$result = ['status' => 'error'];
+		$data = $this->_dataOrdenTrab($request);
+
+		$reg = OrdenTrabajo::lockForUpdate()
+							->updateOrInsert(['idComprobante' => $request->getParam('idComprobante')], 
+								$data );
+		if ($reg) {
+			$result['status'] = 'ok';
+		}
+
+		return json_encode($result);
+	}
+
+	/**
+	 * Guardar Tab Extras (POST)
+	 * Name: presupuesto.guardarextras
+	 *
+	 * @param  Request $request
+	 * @param  Response $response
+	 * @return json
+	 */
+	public function guardarExtras($request, $response)
+	{
+		$result = ['status' => 'error'];
+		$data = $this->_dataExtras($request);
+
+		Extra::where('idComprobante', $request->getParam('idComprobante'))
+			  ->delete();
+
+		foreach ($data as $value) {
+			$extra = Extra::create($value);
+		}
+
+		if ($extra) {
+			$result['status'] = 'ok';
+		}
+
+		return json_encode($result);
+	}
+
 
 	/**
 	 * Elimina ambiente y sus productos
@@ -527,7 +675,6 @@ class PresupuestoController extends Controller
 	private function _dataAmbientes($req)
 	{
 		$datos = $req->getParams();
-		$idComp = $req->getParam('idComprobante');
 		$temp = $retorno = [];
 		$cont = 1;
 
@@ -545,7 +692,7 @@ class PresupuestoController extends Controller
 					break;
 				case 'importe_'.$cont:
 					$temp['importe'] = $value;
-					$temp['idComprobante'] = $idComp;
+					$temp['idComprobante'] = $req->getParam('idComprobante');
 					$cont++;
 					$retorno[] = $temp;
 					$temp = [];
@@ -564,7 +711,6 @@ class PresupuestoController extends Controller
 	private function _dataProductos($req)
 	{
 		$prods = $req->getParam('productos');
-		$idComp = $req->getParam('idComprobante');
 		$temp = $retorno = [];
 
 		foreach ($prods as $value) {
@@ -595,7 +741,60 @@ class PresupuestoController extends Controller
 		return $retorno;
 	}
 
+	/**
+	 * Extrae datos del request para tab registro de visitas
+	 * 
+	 * @param  Request $req
+	 * @return array
+	 */
+	private function _dataOrdenTrab($req)
+	{
+		return [ 'idComprobante'  => (int)$req->getParam('idComprobante'),
+				 'idEmpleado'     => (int)$req->getParam('idEmpleado'),
+				 'detalle'        => $req->getParam('detalle'),
+				 'fechaTentativa' => $req->getParam('fechaTentativa'),
+				 'fechaEjecucion' => $req->getParam('fechaEjecucion') === '' ? null : $req->getParam('fechaEjecucion') ];
+	}
 
+	/**
+	 * Extrae datos del request para fotos
+	 * 
+	 * @param  Request $req
+	 * @return array
+	 */
+	private function _dataFotos($req)
+	{
+		$fotos = $req->getParam('fotos');
+		$temp = $retorno = [];
 
+		foreach ($fotos as $value) {
+			$temp['idComprobante'] = $req->getParam('idComprobante');
+			$temp['nombreFoto'] = $value;
+			$retorno[] = $temp;
+		}
+
+		return $retorno;
+	}
+
+	/**
+	 * Extrae datos del request para extras
+	 * 
+	 * @param  Request $req
+	 * @return array
+	 */
+	private function _dataExtras($req)
+	{
+		$extras = $req->getParam('extras');
+		$temp = $retorno = [];
+
+		foreach ($extras as $value) {
+			$temp['idComprobante'] = $req->getParam('idComprobante');
+			$temp['descripcion'] = $value['descripcion'];
+			$temp['importe'] = $value['importe'];
+			$retorno[] = $temp;
+		}
+
+		return $retorno;
+	}
 
 }

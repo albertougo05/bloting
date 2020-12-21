@@ -355,6 +355,10 @@
     	    pathGuardarPresup:"{{ path_for('presupuesto.guardarpresupuesto') }}",
     	    pathGuardarAmbien:"{{ path_for('presupuesto.guardarambiente') }}",
     	    pathGuardarProduc:"{{ path_for('presupuesto.guardarproductos') }}",
+    	    pathGuardarOrdTrab:"{{ path_for('presupuesto.guardarordentrab') }}",
+    	    pathGuardarFoto:  "{{ path_for('presupuesto.guardarfoto') }}",
+    	    pathGuardarListaFotos: "{{ path_for('presupuesto.guardarlistafotos') }}",
+    	    pathGuardarExtras: "{{ path_for('presupuesto.guardarextras') }}",
 
     	    pathPresup:       "{{ path_for('presupuesto') }}",
     	    pathPresupBuscar: "{{ path_for('presupuesto.buscar') }}",
@@ -363,22 +367,29 @@
     	    pathGetRegistro:  "{{ path_for('presupuesto.getregistro', {id: ''}) }}",
     	    pathGetPresupuesto:"{{ path_for('presupuesto.getpresupuesto', {id: ''}) }}",
     	    pathGetAmbientes:  "{{ path_for('presupuesto.getambientes', {id: ''}) }}",
-    	    pathGetProductos:   "{{ path_for('presupuesto.getproductos', {id: ''}) }}",
+    	    pathGetProductos:  "{{ path_for('presupuesto.getproductos', {id: ''}) }}",
+    	    pathGetOrdenTrab:  "{{ path_for('presupuesto.getordentrabajo', {id: ''}) }}",
+    	    pathGetFotos:      "{{ path_for('presupuesto.getfotos', {id: ''}) }}",
+    	    pathGetExtras:      "{{ path_for('presupuesto.getextras', {id: ''}) }}",
 
     	    pathImprimir:     "{{ path_for('presupuesto.imprimir') }}",
     	    pathBuscarCliente:"{{ path_for('cliente.buscar') }}",
     	    pathGetCliente:   "{{ path_for('cliente.getcliente') }}",
-    	    pathGuardarFoto:  "{{ path_for('presupuesto.guardarfoto') }}",
     	    pathBorrarFoto:   "{{ path_for('presupuesto.borrarfoto') }}",
-    	    pathEliminaaAmb:  "{{ path_for('presupuesto.eliminaambiente', {id: ''}) }}",
+    	    pathEliminaAmb:   "{{ path_for('presupuesto.eliminaambiente', {id: ''}) }}",
     	    fecha:            "{{ fecha }}",
     	    id_presup:        "{{ id_presup }}",
     	    isMobile:		  "{{ isMobile }}",
     	    guardado:         false,
+    	    guardadoDeTabs:   { registro: false, 
+    	    					presupuesto: false,
+    	    					ordenTrabajo: false,
+    	    					fotos: false,
+    	    					extras: false },
     	    listaDeFotos:     [],
-    	    nuevasFotos:      [],
-    	    productos:        [],
-    	    estadosItem       []
+    	    listaDeExtras:    [],
+     	    productos:        [],
+    	    estadosItem:      [],
     	};
 
 		let obj = {};
@@ -395,10 +406,13 @@
 		{% endfor %}
 
 		{% for estado in estadosItem %}
-			PRESUP.estadosItem.push(estado);
+			obj.id = "{{ estado.id }}";
+			obj.descripcion = "{{ estado.descripcion }}";
+			PRESUP.estadosItem.push(obj);
+			obj = {};
 		{% endfor %}
 
 	</script>
 
-	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.2.8"></script>
+	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.3.1"></script>
 {% endblock %}
