@@ -62,7 +62,8 @@ $app->group('/presupuesto', function () use ($app, $container) {
 	$app->get('/getcomprobante/{id}', 'PresupuestoController:getComprobante')->setName('presupuesto.getcomprobante');
 	# Presupuesto / imprimir
 	$app->get('/imprimir', 'PresupuestoController:imprimir')->setName('presupuesto.imprimir');
-	# Presupuesto / guardarfoto
+
+    # Presupuesto / guardarfoto
 	$app->post('/guardarfoto', 'PresupuestoController:guardarFoto')->setName('presupuesto.guardarfoto');
 	# Presupuesto / borrarfoto
 	$app->post('/borrarfoto', 'PresupuestoController:borrarFoto')->setName('presupuesto.borrarfoto');
