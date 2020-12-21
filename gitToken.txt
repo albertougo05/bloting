@@ -1,0 +1,10 @@
+
+GIT Token. (Para acceder a repositorios sin ingresar clave)
+-----------------------------------------------------------
+
+Ingresar este token en lugar de la contraseña.
+
+3f5f574c6a7d08fae124c135239053cce899a022
+
+Fuente: https://docs.github.com/es/github/authenticating-to-github/creating-a-personal-access-token
+
