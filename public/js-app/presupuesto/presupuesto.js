@@ -218,6 +218,7 @@ PRESUP.onClickBtnGuardarExtras = function () {
 		PRESUP.pathGuardarExtras,
 		PRESUP.id_presup
 	);
+	PRESUP.guardadoDeTabs.extras = true;
 }
 
 /**
@@ -302,21 +303,9 @@ PRESUP.winBuscarPresup = function () {		// Crea ventana para buscar presupuesto 
 			let idPresup = '';
 
 			if (cerrar) {
-				idPresup = this._idPresup;
-				// console.log("Se cierra la ventana buscar... (" + idPresup + ")");
+				// console.log("Se cierra la ventana buscar... (" + this._idPresup + ")");
 				this.close();
-				PRESUP.winBuscar = false;
-				PRESUP.guardado = true;		// Para permitir guardar Tabs
-
-				buscarComprobante(idPresup, PRESUP.pathGetComprob);
-				PRESUP.id_presup = idPresup;	// Set el id del comprobante
-				buscarRegistro(idPresup, PRESUP.pathGetRegistro);
-				buscarPresupuesto(idPresup, PRESUP.pathGetPresupuesto);
-				PRESUP._ambientes.buscarAmbientes(idPresup, PRESUP.pathGetAmbientes);
-				PRESUP._ingresoProds.buscarProductos(idPresup, PRESUP.pathGetProductos);
-				buscarOrdenTrabajo(idPresup, PRESUP.pathGetOrdenTrab);
-				FOTOS.buscarFotos(idPresup, PRESUP.pathGetFotos, PRESUP.isMobile);
-				uiDeExtras.buscarExtras(idPresup, PRESUP.pathGetExtras);
+				location.assign( PRESUP.pathPresup + "?idComp=" + this._idPresup );
 			}
 		});
 		this.objWinBuscar.addEventListener("beforeunload", function (e) {
@@ -425,7 +414,6 @@ $( function () {
 
 		if ( guardarComprob.validarComprob() ) {
 			$('#spinnerGuardar').show();
-			guardarComprob.establecerEstadoComprob();
 			guardarComprob.salvarComprob(PRESUP.pathGuardar, PRESUP.guardadoDeTabs);
 		}
 
@@ -544,21 +532,31 @@ $( function () {
 		}
 	});
 
+	/**
+	 *
+	 * Si viene el id de comprobante carga los datos de la página
+	 * 
+	 */
+	if (PRESUP.idComprobante > 0) {
+		//console.log('Id Comprobante:', PRESUP.idComprobante);
+		PRESUP.guardado = true;		// Para permitir guardar Tabs
+		buscarComprobante(PRESUP.idComprobante, PRESUP.pathGetComprob);
+		PRESUP.id_presup = PRESUP.idComprobante;	// Set el id del comprobante
+		buscarRegistro(PRESUP.idComprobante, PRESUP.pathGetRegistro);
+		buscarPresupuesto(PRESUP.idComprobante, PRESUP.pathGetPresupuesto);
+		PRESUP._ambientes.buscarAmbientes(PRESUP.idComprobante, PRESUP.pathGetAmbientes);
+		PRESUP._ingresoProds.buscarProductos(PRESUP.idComprobante, PRESUP.pathGetProductos);
+		buscarOrdenTrabajo(PRESUP.idComprobante, PRESUP.pathGetOrdenTrab);
+		FOTOS.buscarFotos(PRESUP.idComprobante, PRESUP.pathGetFotos, PRESUP.isMobile);
+		uiDeExtras.buscarExtras(PRESUP.idComprobante, PRESUP.pathGetExtras);
+	}
+
 	// Evento antes de cerrar la ventana
 	$(window).on("beforeunload", function(e)
 	{
 		if (PRESUP.winBuscar) {		// Si está abierta la ventana de buscar presupuesto
 			PRESUP.objWinBuscar.close();    // ... la cierra
 		}
-
-		// POR AHORA NO VA A BORRAR LAS FOTOS, SI NO GUARDA EL DOCUMENTO
-		// if (PRESUP.nuevasFotos.length > 0 && !PRESUP.guardado) {
-		//  	FOTOS.borrar(PRESUP.nuevasFotos, PRESUP.pathBorrarFoto)
-		//  		.then(data => {
-		//				console.log(data);
-		//  			console.log('Ya está !');
-		//  	});
-		// }
 	});
 
 

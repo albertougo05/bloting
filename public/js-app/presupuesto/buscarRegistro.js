@@ -15,6 +15,7 @@ function buscarRegistro(id, url) {
 			return null;
 		} else {
 			_mostrarRegistro(resp);
+			PRESUP.guardadoDeTabs.registro = false;
 		}
 	});
 }

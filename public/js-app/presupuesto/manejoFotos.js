@@ -39,6 +39,8 @@ var FOTOS = {
 				const lista = resp.map(foto => foto.nombreFoto);
 				FOTOS.fotosAlContenedor(lista, ismobile);
 				PRESUP.listaDeFotos = lista;
+				PRESUP.guardadoDeTabs.fotos = false;
+
 			}
 		});
 	},
@@ -123,6 +125,7 @@ var FOTOS = {
 
 				image.onload = function () {
 					FOTOS.agregarFotoADisplay(ismobile, image);
+					PRESUP.guardadoDeTabs.fotos = false;
 				};
 			}
 		} else {

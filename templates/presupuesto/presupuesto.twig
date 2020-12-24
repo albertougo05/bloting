@@ -101,7 +101,7 @@
 
 							{# FECHA ANULACION #}
 							<div class="col-sm-3 mt-2 col-label">
-								<label class="lblPresup" for="fechaAnulaoElimina">Anulado</label>
+								<label class="lblPresup" for="fechaAnulaoElimina">Anulado/Eliminado</label>
 							</div>
 							<div class="col-sm-3 mt-2">
 							    <input type="date" class="form-control form-control-sm" id="fechaAnulaoElimina" name="fechaAnulaoElimina" disabled>
@@ -367,15 +367,16 @@
     	    id_presup:        "{{ id_presup }}",
     	    isMobile:		  "{{ isMobile }}",
     	    guardado:         false,
-    	    guardadoDeTabs:   { registro: false, 
-    	    					presupuesto: false,
-    	    					ordenTrabajo: false,
-    	    					fotos: false,
-    	    					extras: false },
+    	    guardadoDeTabs:   { registro: true, 
+    	    					presupuesto: true,
+    	    					ordenTrabajo: true,
+    	    					fotos: true,
+    	    					extras: true },
     	    listaDeFotos:     [],
     	    listaDeExtras:    [],
      	    productos:        [],
     	    estadosItem:      [],
+    	    idComprobante:    "{{ idComprobante }}"
     	};
 
 		let obj = {};

@@ -37,11 +37,13 @@ class ManejoAmbientes {
 		acordion.childNodes.forEach((elem, idx) => {		// Elimina falsos nodos
 			if (elem.id === undefined) {
 				acordion.removeChild(acordion.childNodes[idx]);
+				console.log('Encontró udefined...');
 			}
 		});
 
 		const divCard = document.getElementById('idCardAmb-' + id);
-		divCard.style.display = 'none';
+		acordion.removeChild(divCard);
+		//divCard.style.display = 'none';
 		//acordion.removeChild(acordion.childNodes[indice]);
 	}
 
@@ -192,7 +194,7 @@ class UiAmbiente {
 		const htmlCreator = new CreaHtml();
 		const htmlCardHeader = htmlCreator.htmlHeader(this.ambientes[idx-1], idx);
 		const cardAmb = document.getElementById('accordionAmbientes');
-		const idColapse = 'collapseAmb-' + (idx-1);		// el collapse anterior
+		const idColapse = 'collapseAmb-1';		// collapse tab 1
 		const divColapse = document.getElementById(idColapse);
 
 		cardAmb.insertAdjacentHTML('beforeend', htmlCardHeader);		// Inserta el card del ambiente

@@ -104,7 +104,30 @@ var COMMONS = {
           .replace('.', ',') // replace decimal point character with ,
           .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
     ) // use . as a separator
-  }
+  },
+
+  fechaActual: function () {
+    let dia = '',
+        mes = '';
+    const date = new Date()
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
+
+    if (date < 10) {
+      dia += `0${day}`;
+    } else {
+      dia += day;
+    }
+
+    if (month < 10){
+      mes += `0${month}`;
+    } else {
+      mes += month;
+    }
+
+    return `${year}-${mes}-${dia}`;
+  },
 
 
 };

@@ -14,7 +14,8 @@ function buscarOrdenTrabajo(id, url) {
 			//console.log(resp);
 			return null;
 		} else {
-			_datosAlTabOrden(resp);			
+			_datosAlTabOrden(resp);	
+			PRESUP.guardadoDeTabs.ordenTrabajo = false;		
 		}
 	});
 }

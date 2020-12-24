@@ -138,8 +138,18 @@ $container['UsuarioController'] = function ($container) {
 
     return new \App\Controllers\Usuarios\UsuarioController($container);
 };
-// Utils
+// Presupuesto (comprobantes)
 $container['PresupuestoController'] = function ($container) {
 
     return new \App\Controllers\Presupuesto\PresupuestoController($container);
+};
+// Presupuesto (Fotos)
+$container['FotosController'] = function ($container) {
+
+    return new \App\Controllers\Presupuesto\FotosController($container);
+};
+// Presupuesto (Tab Presupuesto)
+$container['TabPresupuestoController'] = function ($container) {
+
+    return new \App\Controllers\Presupuesto\TabPresupuestoController($container);
 };

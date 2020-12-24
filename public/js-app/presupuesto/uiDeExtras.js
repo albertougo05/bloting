@@ -36,6 +36,7 @@ var uiDeExtras = ( function() {
 
 				lista.forEach( (list, idx) => {
 					_agregaLineaTabla(list, idx);
+					PRESUP.guardadoDeTabs.extras = false;
 				});
 				PRESUP.listaDeExtras = lista;
 			}

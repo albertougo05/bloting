@@ -14,6 +14,7 @@ function buscarPresupuesto(id, url) {
 			return null;
 		} else {
 			_mostrarPresupuesto(resp);
+			PRESUP.guardadoDeTabs.presupuesto = false;
 		}
 	});
 }

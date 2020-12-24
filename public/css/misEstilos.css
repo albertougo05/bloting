@@ -44,6 +44,7 @@ body {
     cursor: pointer;
     position: fixed;
     display: none;
+    z-index: 1000;
 }
 .tridimLogo {
     position: absolute;

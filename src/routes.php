@@ -63,33 +63,35 @@ $app->group('/presupuesto', function () use ($app, $container) {
 	# Presupuesto / imprimir
 	$app->get('/imprimir', 'PresupuestoController:imprimir')->setName('presupuesto.imprimir');
 
-    # Presupuesto / guardarfoto
-	$app->post('/guardarfoto', 'PresupuestoController:guardarFoto')->setName('presupuesto.guardarfoto');
+	# Presupuesto / guardarfoto
+	$app->post('/guardarfoto', 'FotosController:guardarFoto')->setName('presupuesto.guardarfoto');
 	# Presupuesto / borrarfoto
-	$app->post('/borrarfoto', 'PresupuestoController:borrarFoto')->setName('presupuesto.borrarfoto');
+	$app->post('/borrarfoto', 'FotosController:borrarFoto')->setName('presupuesto.borrarfoto');
 	# Presupuesto / guardarlistafotos
-	$app->post('/guardarlistafotos', 'PresupuestoController:guardarListaFotos')->setName('presupuesto.guardarlistafotos');
+	$app->post('/guardarlistafotos', 'FotosController:guardarListaFotos')->setName('presupuesto.guardarlistafotos');
 	# Presupuesto / getfotos
-	$app->get('/getfotos/{id}', 'PresupuestoController:getFotos')->setName('presupuesto.getfotos');
+	$app->get('/getfotos/{id}', 'FotosController:getFotos')->setName('presupuesto.getfotos');
 
 	# Presupuesto / guardarregistro
 	$app->post('/guardarregistro', 'PresupuestoController:guardarRegistro')->setName('presupuesto.guardarregistro');
 	# Presupuesto / getregistro
 	$app->get('/getregistro/{id}', 'PresupuestoController:getRegistro')->setName('presupuesto.getregistro');
+
 	# Presupuesto / guardarpresupuesto
-	$app->post('/guardarpresupuesto', 'PresupuestoController:guardarPresupuesto')->setName('presupuesto.guardarpresupuesto');
+	$app->post('/guardarpresupuesto', 'TabPresupuestoController:guardarPresupuesto')->setName('presupuesto.guardarpresupuesto');
 	# Presupuesto / getpresupuesto
-	$app->get('/getpresupuesto/{id}', 'PresupuestoController:getPresupuesto')->setName('presupuesto.getpresupuesto');
+	$app->get('/getpresupuesto/{id}', 'TabPresupuestoController:getPresupuesto')->setName('presupuesto.getpresupuesto');
 	# Presupuesto / guardarambiente
-	$app->post('/guardarambiente', 'PresupuestoController:guardarAmbiente')->setName('presupuesto.guardarambiente');
+	$app->post('/guardarambiente', 'TabPresupuestoController:guardarAmbiente')->setName('presupuesto.guardarambiente');
 	# Presupuesto / getambientes
-	$app->get('/getambientes/{id}', 'PresupuestoController:getAmbientes')->setName('presupuesto.getambientes');
+	$app->get('/getambientes/{id}', 'TabPresupuestoController:getAmbientes')->setName('presupuesto.getambientes');
 	# Presupuesto / eliminaambiente
-	$app->get('/eliminaambiente', 'PresupuestoController:eliminaAmbiente')->setName('presupuesto.eliminaambiente');
+	$app->get('/eliminaambiente', 'TabPresupuestoController:eliminaAmbiente')->setName('presupuesto.eliminaambiente');
 	# Presupuesto / guardarproductos
-	$app->post('/guardarproductos', 'PresupuestoController:guardarProductos')->setName('presupuesto.guardarproductos');
+	$app->post('/guardarproductos', 'TabPresupuestoController:guardarProductos')->setName('presupuesto.guardarproductos');
 	# Presupuesto / getproductos
-	$app->get('/getproductos/{id}', 'PresupuestoController:getProductos')->setName('presupuesto.getproductos');
+	$app->get('/getproductos/{id}', 'TabPresupuestoController:getProductos')->setName('presupuesto.getproductos');
+
 	# Presupuesto / guardarordentrab
 	$app->post('/guardarordentrab', 'PresupuestoController:guardarOrdenTrab')->setName('presupuesto.guardarordentrab');
 	# Presupuesto / getordentrabajo
