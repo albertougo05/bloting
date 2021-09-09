@@ -1,0 +1,36 @@
+{# Datos de tab Orden de Trabajo #}
+
+<div class="row">
+	<div class="col offset-1 mt-4 mb-0">
+		<h3 class="font-weight-bold text-muted">Orden de Trabajo</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-10 offset-1">
+		<hr class="mt-0"/>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-5 offset-2">
+		<p class="data">Empleado que realizó OT:&nbsp;<strong>{{ dataTab.orden.apellidoNombre }}</strong>&nbsp;({{ dataTab.orden.idEmpleado }})</p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-4 offset-2">
+		<p class="data">Fecha tentativa:&nbsp;<strong>{{ dataTab.orden.fechaTentativa|date("d/m/Y") }}</strong></p>
+	</div>
+	<div class="col-4">
+		<p class="data">Fecha ejecución:&nbsp;<strong>{{ dataTab.orden.fechaEjecucion ? dataTab.orden.fechaEjecucion|date("d/m/Y") : '' }}</strong></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-8 offset-2 mt-2">
+		<p class="data">Detalle:&nbsp;<strong>{{ dataTab.orden.detalle }}</strong></p>
+	</div>
+</div>
+
+

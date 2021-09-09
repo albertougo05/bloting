@@ -18,10 +18,6 @@
 	font-size: 14px !important;
 	float: right;
 }
-/*#btnConfirma, #btnCancela, #btnImprime {
-	width: 80px;
-}*/
-
 #scrollUp {
     background-image: url("../img/arrow_up_blue_white.png");
     bottom: 20px;

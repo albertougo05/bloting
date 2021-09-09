@@ -3,6 +3,21 @@
 	{{ csrf.field | raw }}
 
 	<div class="row">
+		{# REALIZADO POR #}
+		<div class="col-4 mt-2 col-label">
+			<label class="lblPresup" for="idEmpleado">Realizado por</label> 
+		</div>
+		<div class="col-8 mt-2">
+			<select class="form-control form-control-sm" id="idEmpleado" name="idEmpleado">
+				<option value="0">Seleccione empleado...</option>
+				{% for empl in empleados %}
+					<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	<div class="row">
 		{# FECHA TENTATIVA TRABAJO #}
 		<div class="col-5 mt-2 col-label">
 			<label class="lblPresup" for="fechaTentativa">Fecha Tentativa O.T.</label>
@@ -29,21 +44,6 @@
 		</div>
 	</div>
 
-	<div class="row">
-		{# REALIZADO POR #}
-		<div class="col-4 mt-3 col-label">
-			<label class="lblPresup" for="idEmpleado">Realizado por</label> 
-		</div>
-		<div class="col-8 mt-3">
-			<select class="form-control form-control-sm" id="idEmpleado" name="idEmpleado">
-				<option value="0">Seleccione empleado...</option>
-				{% for empl in empleados %}
-					<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
-				{% endfor %}
-			</select>
-		</div>
-	</div>
-
 </form>
 
 <div class="row">
@@ -58,5 +58,11 @@
 			type="button" 
 			class="btn btn-sm btn-success">
 		Guardar Orden Trabajo
+		<button id="btnImprimeOrden" 
+				onclick="PRESUP.onClickBtnImprimir('orden');"
+				class="btn btn-info btn-sm ml-3"
+				{% if data.orden.idEmpleado == 0 %} disabled {% endif %}>
+			Imprimir
+		</button>
 	</button>
 </div>

@@ -4,7 +4,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use App\Middleware\AuthMiddleware;
 
-// RUTAS INICIO
+## RUTAS INICIO
 
 	# Index -  Inicio
 	$app->get('/', 'HomeController:index')->setName('index');
@@ -15,9 +15,10 @@ use App\Middleware\AuthMiddleware;
 	# Home. Pagina con menus y usuario
 	$app->get('/home', 'HomeController:home')->setName('home');
 
-//
-//  OTRAS RUTAS
-//  
+
+##
+##  OTRAS RUTAS
+##  
 
 
 # CLIENTES
@@ -35,6 +36,7 @@ $app->group('/cliente', function () use ($app, $container) {
 
 })->add(new AuthMiddleware($container));
 
+
 # USUARIOS
 $app->group('/usuario', function () use ($app, $container) {
 
@@ -49,6 +51,7 @@ $app->group('/usuario', function () use ($app, $container) {
 
 })->add(new AuthMiddleware($container));
 
+
 # PRESUPUESTO
 $app->group('/presupuesto', function () use ($app, $container) {
 
@@ -58,8 +61,6 @@ $app->group('/presupuesto', function () use ($app, $container) {
 	$app->post('/guardar', 'PresupuestoController:guardar')->setName('presupuesto.guardar');
 	# Presupuesto / buscar
 	$app->get('/buscar', 'PresupuestoController:buscar')->setName('presupuesto.buscar');
-	# Presupuesto / getcomprobante
-	$app->get('/getcomprobante/{id}', 'PresupuestoController:getComprobante')->setName('presupuesto.getcomprobante');
 	# Presupuesto / imprimir
 	$app->get('/imprimir', 'PresupuestoController:imprimir')->setName('presupuesto.imprimir');
 
@@ -74,13 +75,9 @@ $app->group('/presupuesto', function () use ($app, $container) {
 
 	# Presupuesto / guardarregistro
 	$app->post('/guardarregistro', 'PresupuestoController:guardarRegistro')->setName('presupuesto.guardarregistro');
-	# Presupuesto / getregistro
-	$app->get('/getregistro/{id}', 'PresupuestoController:getRegistro')->setName('presupuesto.getregistro');
 
 	# Presupuesto / guardarpresupuesto
 	$app->post('/guardarpresupuesto', 'TabPresupuestoController:guardarPresupuesto')->setName('presupuesto.guardarpresupuesto');
-	# Presupuesto / getpresupuesto
-	$app->get('/getpresupuesto/{id}', 'TabPresupuestoController:getPresupuesto')->setName('presupuesto.getpresupuesto');
 	# Presupuesto / guardarambiente
 	$app->post('/guardarambiente', 'TabPresupuestoController:guardarAmbiente')->setName('presupuesto.guardarambiente');
 	# Presupuesto / getambientes
@@ -94,11 +91,13 @@ $app->group('/presupuesto', function () use ($app, $container) {
 
 	# Presupuesto / guardarordentrab
 	$app->post('/guardarordentrab', 'PresupuestoController:guardarOrdenTrab')->setName('presupuesto.guardarordentrab');
-	# Presupuesto / getordentrabajo
-	$app->get('/getordentrabajo/{id}', 'PresupuestoController:getOrdenTrabajo')->setName('presupuesto.getordentrabajo');
+
 	# Presupuesto / guardarextras
 	$app->post('/guardarextras', 'PresupuestoController:guardarExtras')->setName('presupuesto.guardarextras');
 	# Presupuesto / getextras
 	$app->get('/getextras/{id}', 'PresupuestoController:getExtras')->setName('presupuesto.getextras');
+
+	# Presupuesto / getidcomprobante
+	$app->get('/getidcomprobante/{id}', 'PresupuestoController:getIdComprobante')->setName('presupuesto.getidcomprobante');
 
 })->add(new AuthMiddleware($container));

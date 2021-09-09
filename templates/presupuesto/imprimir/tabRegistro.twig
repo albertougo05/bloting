@@ -1,0 +1,61 @@
+{# Datos de tab Registro de Visitas #}
+
+<div class="row">
+	<div class="col offset-1 mt-4 mb-0">
+		<h3 class="font-weight-bold text-muted">Registro de visitas</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-10 offset-1">
+		<hr class="mt-0"/>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-5 offset-2">
+		<p class="data">Empleado que realizó RV:&nbsp;<strong>{{ dataTab.registro.apellidoNombre }}</strong>&nbsp;({{ dataTab.registro.idEmpleado }})</p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-4 offset-2">
+		<p class="data">Fecha tentativa visita:&nbsp;<strong>{{ dataTab.registro.fechaTentativa|date("d/m/Y") }}</strong></p>
+	</div>
+	<div class="col-4">
+		<p class="data">Fecha de visita:&nbsp;<strong>{{ dataTab.registro.fechaVisita ? dataTab.registro.fechaVisita|date("d/m/Y") : '' }}</strong></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-8 offset-2">
+		<p class="data">Detalle:&nbsp;<strong>{{ dataTab.registro.detalle }}</strong></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-8 offset-2">
+		<hr class="mt-2 mb-2"/>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-2 offset-2">
+		<p class="data">¿ Qué solicita ?</p>
+		<p class="data">¿ Qué urgencia tiene ?</p>
+		<p class="data">¿ Cómo contactó ?</p>
+		<p class="data">¿ Cómo nos conoció ?</p>
+		<p class="data">¿ Conoce el sistema ?</strong></p>
+		<p class="data">¿ Cómo nos comunicamos ?</strong></p>
+	</div>
+
+	<div class="col-4">
+		<p class="data"><strong>{{ dataTab.registro.queSolicita }}</strong></p>
+		<p class="data"><strong>{{ dataTab.registro.queUrgencia }}</strong></p>
+		<p class="data"><strong>{{ dataTab.registro.comoContacto }}</strong></p>
+		<p class="data"><strong>{{ dataTab.registro.comoConocio }}</strong></p>
+		<p class="data"><strong>{{ dataTab.registro.conoceSistema }}</strong></p>
+		<p class="data"><strong>{{ dataTab.registro.comoNosComunic }}</strong></p>
+	</div>
+</div>

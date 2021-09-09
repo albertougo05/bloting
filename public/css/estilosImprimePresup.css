@@ -1,0 +1,67 @@
+body {
+	margin: 2em;
+	color: #000;
+	font-size: 85%;
+}
+/* override styles when printing */
+@media print {
+  body {
+    margin: 0;
+    color: #000;
+  }
+
+  /* Esconder secciones al imprimir */
+  header, footer {
+  display: none!important;
+  }
+
+}
+@page {
+  margin-top: 1cm;
+  margin-bottom: 1cm;
+  margin-left: 2cm;
+  margin-right: 1cm;
+}
+.h3Titulo {
+	font-weight: bold;
+}
+.cellRight {
+  text-align: right;
+}
+p#razon {
+	font-size: 1.1em;
+}
+p.data {
+	/*font-size: 0.875em;*/
+	margin: 0 1px;
+}
+hr.lin {
+	margin: 10px auto;
+}
+#btnImprimir {
+	margin-right: 20px;
+}
+/* textarea {
+	width: 800px;
+	height: 300px;
+	margin-bottom: 20px;
+} */
+textarea:disabled {
+	color: black;
+}
+.head2 {
+	background: #515A5A;
+	color: white;
+	font-weight: normal !important;
+	font-size: 0.8em;
+}
+.fontBodyTable {
+	font-weight: normal !important;
+	font-size: 0.8em;
+}
+.dataImporte {
+	padding: 5px;
+}
+#botones > button {
+  width: 110px;
+} 

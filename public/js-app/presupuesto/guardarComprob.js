@@ -24,15 +24,12 @@ var guardarComprob = (function() {
         toastr.options = PRESUP.toastrSuccessOptions;
             toastr.success("Perfecto !", "Presupuesto guardado con éxito !!");
         toastr.options = PRESUP.toastrErrorOptions;
-        $('#btnImprime').prop( 'disabled', false );
-        $('#btnConfirma').prop( 'disabled', true );
         PRESUP.guardado = true;
     }
 
     const _recolectData = function() {     // Recolectar los datos
-         _pasarImporte();
+        _pasarImporte();
         const form = document.getElementById('form_comprob');
-        const observac = document.getElementById('observaciones').value;
         let dataComp = new FormData(form);
 
         // Actualizar fecha de último cambio
@@ -40,11 +37,9 @@ var guardarComprob = (function() {
 
         // si el estado es Anulado o Eliminado...
         const idEstado = document.getElementById('idEstado').value;
-        if (idEstado == 7 || idEstado == 8) {
+        if (idEstado == 8 || idEstado == 9) {
             dataComp.append('fechaAnulaoElimina', COMMONS.fechaActual());
         }
-
-        dataComp.append('observaciones', observac);
 
         return dataComp;
     }
@@ -53,27 +48,6 @@ var guardarComprob = (function() {
         return { idEmpRegistro: $('#form_registro select[name=idEmpleado]').val(),
                  idEmpPresup:   $('#form_presup1 select[name=idEmpleado]').val(),
                  idEmpOrdenT:   $('#form_ordenTrab select[name=idEmpleado]').val() };
-    }
-
-    // Verifica si los tabs tienen seteado empleado para que se guarden 
-    const _checkTabsParaGuardar = (guardadoDeTabs) => {
-        const { idEmpRegistro, idEmpPresup, idEmpOrdenT } = _idsSelects();
-
-        if (idEmpRegistro > 0 && !guardadoDeTabs.ordenTrabajo) {
-            toastr.error("Atención !", "Debe guardar Registro Visita !!");
-        }
-        if (idEmpPresup > 0 && !guardadoDeTabs.presupuesto) {
-            toastr.error("Atención !", "Debe guardar Presupuesto !!");
-        }
-        if (idEmpOrdenT > 0 && !guardadoDeTabs.ordenTrabajo) {
-            toastr.error("Atención !", "Debe guardar Orden de Trabajo !!");
-        }
-        if (!guardadoDeTabs.fotos) {
-            toastr.error("Atención !", "Debe guardar Fotos !!");
-        }
-        if (!guardadoDeTabs.extras) {
-            toastr.error("Atención !", "Debe guardar Extras !!");
-        }
     }
 
     const _validarRegistroVisita = () => {
@@ -128,10 +102,12 @@ var guardarComprob = (function() {
         const id = $('#form_comprob input[name=id]').val(); // Add id del comprobante
         dataReg.append('idComprobante', id);
 
+        //console.log('idComprobante:', id);
+
         const options = { method: 'POST',
                           body: dataReg };
         const res = await fetch(endpoint, options);
-        let data = await res.json();
+        const data = await res.json();
         //console.log('Status registro:', data);
         toastr.options = PRESUP.toastrSuccessOptions;
             toastr.success("Perfecto !", "Registro guardado con éxito !!");
@@ -150,11 +126,14 @@ var guardarComprob = (function() {
         try {
             const res = await fetch(endpoint, options);
             let data = await res.json();
-            console.log('Status orden trabajo:', data);
+            //console.log('Status orden trabajo:', data);
             toastr.options = PRESUP.toastrSuccessOptions;
                 toastr.success("Perfecto !", "Orden Trabajo guardada con éxito !!");
             toastr.options = PRESUP.toastrErrorOptions;
             PRESUP.guardadoDeTabs.ordenTrabajo = true;
+            // Habilito boton imprimir
+            document.getElementById('btnImprimeOrden').disabled = false;
+
         } catch (error) {
             toastr.error("Error !", "La Orden Trabajo no pudo ser guardada !!");
         }
@@ -179,7 +158,9 @@ var guardarComprob = (function() {
                           body: dataPresup };
         const res = await fetch(endpoint, options);
         let data = await res.json();
+
         //console.log('Status presup:', data);
+
         toastr.options = PRESUP.toastrSuccessOptions;
             toastr.success("Perfecto !", "Presupuesto guardado con éxito !!");
         toastr.options = PRESUP.toastrErrorOptions;
@@ -245,7 +226,7 @@ var guardarComprob = (function() {
     const _establecerEstadoComprob = () => {
         const { idEmpRegistro, idEmpPresup, idEmpOrdenT } = _idsSelects();
         const elemTipoComp = document.getElementById('idTipoComprobante');
-        const idTipoComprobante = elemTipoComp.value;
+        const idTipoCompActual = elemTipoComp.value;
         let idTipoComp = 0;
 
         if (idEmpRegistro > 0) {
@@ -281,17 +262,15 @@ var guardarComprob = (function() {
 
         try {
             const resp = await fetch(req);
-
             const data = await resp.json();  // Si todo está Ok, data es un json
             _exitoEnGuardar(data);
-            //_checkTabsParaGuardar(guardadoDeTabs);
-
         } catch (err) {
             console.log('ERROR: ', err.message);
             toastr.error("Error en Presupuesto", "Error al guardar datos !!");
         }
     }
 
+    // Comprobar campos obligatorios
     let validarComprob = () => {
         // Fecha
         if ( COMMONS.isEmpty( $('#fecha').val() ) ) {
@@ -317,6 +296,12 @@ var guardarComprob = (function() {
             $('#localidad').focus();
             return false;
         }
+        // Teléfono
+        if ( COMMONS.isEmpty( $('#telefono').val() ) ) {
+            toastr.error("Error en Presupuesto", "Debe ingresar un Teléfono !!");
+            $('#telefono').focus();
+            return false;
+        }
         // Registro de visita
         if (!_validarRegistroVisita()) {
             return false;
@@ -334,8 +319,13 @@ var guardarComprob = (function() {
     let salvarRegistro = function (url) {
         // Verificar si está guardado el comprobante
         if ( PRESUP.guardado && _validarRegistroVisita() ) {
+
+            //console.log('Guardando registro...');
+
             _salvandoRegistro(url);
             _establecerEstadoComprob();
+            // Habilito boton de imprimir
+            document.getElementById('btnImprimeRegistro').disabled = false;
         } else {
             toastr.error("Error al salvar registro", "Debe Confirmar el comprobante !!");
         }
@@ -366,7 +356,7 @@ var guardarComprob = (function() {
     }
 
     let salvarFotos = function (listaDeFotos, endPoint, idPresup) {
-        // Verificar si idComprobante > 0
+
         if ( PRESUP.guardado ) {
             _salvandoFotos(listaDeFotos, endPoint, idPresup)
                 .then(data => {

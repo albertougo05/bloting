@@ -30,7 +30,7 @@ class HomeController extends Controller
 
 		$variables = array('titulo' => 'Inicio');
 
-		return $this->view->render($response, 'index.twig', $variables);
+		return $this->view->render($response, 'login.twig', $variables);
 	}
 
 
@@ -53,14 +53,14 @@ class HomeController extends Controller
 		$variables = array('titulo' => 'Menú' );
 
 		//
-		// Detectar si es mobile
+		// Detectar si es mobile -> true ) { // 
 		//
 		if ( $this->mobileDetect->isMobile() ) {
 			$_SESSION['isMobile'] = true;
-			$vista = 'home_mobile.twig';
+			$vista = 'index_mobile.twig';
 		} else {
 			$_SESSION['isMobile'] = false;
-			$vista = 'home.twig';
+			$vista = 'index.twig';
 		}
 
 		// Borrar mensajes Flash
@@ -87,7 +87,7 @@ class HomeController extends Controller
 		$this->auth->logout();
 		$_SESSION['isMobile'] = false;
 
-		$variables = array('titulo' => 'Ramago - Login');
+		$variables = array('titulo' => 'Login');
 
 		return $this->view->render($response, 'login.twig', $variables);
 	}

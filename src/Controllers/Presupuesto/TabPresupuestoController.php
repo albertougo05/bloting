@@ -5,6 +5,7 @@ namespace App\Controllers\Presupuesto;
 use App\Models\Presupuesto;
 use App\Models\Ambiente;
 use App\Models\ProductoAmbiente;
+use App\Models\Comprobante;
 
 use App\Controllers\Controller;
 
@@ -16,30 +17,6 @@ use App\Controllers\Controller;
  */
 class TabPresupuestoController extends Controller
 {
-	/**
-	 * Devuelva json con datos para tab presupuesto
-	 * Name: presupuesto.getpresupuesto/{id}
-	 * 
-	 * @param  Request $request
-	 * @param  Response $response
-	 * @param  array $args
-	 * @return json
-	 */
-	public function getPresupuesto($request, $response, $args)
-	{
-		$id = $args['id'];
-		$id = filter_var( $id, FILTER_SANITIZE_NUMBER_INT );
-		$registro = Presupuesto::where( 'idComprobante', $id )
-								->first();
-		if ($registro) {
-			$registro = $registro->toArray();
-		} else {
-			$registro = ['status' => 'No hay registro'];
-		}
-
-		return json_encode($registro);
-	}
-
 	/**
 	 * Devuelva json con datos de ambientes
 	 * Name: presupuesto.getambientes/{id}
@@ -54,6 +31,7 @@ class TabPresupuestoController extends Controller
 		$id = $args['id'];
 		$id = filter_var( $id, FILTER_SANITIZE_NUMBER_INT );
 		$registros = Ambiente::where( 'idComprobante', $id )
+							->where('eliminado', '=', 0)
 							->get();
 		if ($registros) {
 			$registros = $registros->toArray();
@@ -77,7 +55,8 @@ class TabPresupuestoController extends Controller
 	{
 		$id = $args['id'];
 		$id = filter_var( $id, FILTER_SANITIZE_NUMBER_INT );
-		$registros = ProductoAmbiente::where( 'idComprobante', $id )
+		$registros = ProductoAmbiente::where('idComprobante', $id)
+									->where('idEstadoItem', '>', 0)
 									->orderBy('idAmbiente')
 									->get()
 									->toArray();
@@ -105,7 +84,8 @@ class TabPresupuestoController extends Controller
 							->updateOrInsert(['idComprobante' => $request->getParam('idComprobante') ], $dataForm );
 		if ($prep) {
 			$result['status'] = 'ok';
-			$this->PresupuestoController->setFechaUltimoCambio($request->getParam('idComprobante'));
+			$this->_setImporteComprobante($request);
+			$this->PresupuestoController->setFechaUltimoCambioYTipoComp($request->getParam('idComprobante'), 2);
 		}
 		return json_encode($result);
 	}
@@ -125,9 +105,8 @@ class TabPresupuestoController extends Controller
 
 		foreach ($data as $value) {
 			$amb = Ambiente::lockForUpdate()
-							->updateOrInsert([ 'idComprobante' => $request->getParam('idComprobante'),
-											   'idAmbiente' => $value['idAmbiente'] ], 
-											   $value );
+							->updateOrInsert(['id' => $value['id']], 
+											$value );
 		}
 
 		if ($amb) {
@@ -151,11 +130,12 @@ class TabPresupuestoController extends Controller
 		$data = $this->_dataProductos($request);
 
 		foreach ($data as $value) {
+			if ($value['id'] === 0 && $value['idEstadoItem'] === 0) {
+				continue;	// No tiene id de registro y ha sido eliminado el ambiente (idEstadoItem == 0)
+			}
+
 			$prod = ProductoAmbiente::lockForUpdate()
-					->updateOrInsert([ 'idComprobante' => $request->getParam('idComprobante'),
-									   'idAmbiente' => $value['idAmbiente'],
-									   'idProducto' => $value['idProducto'],
-									   'idTipoProducto' => $value['idTipoProducto'] ],
+						->updateOrInsert([ 'id' => $value['id'] ],
 									    $value );
 		}
 
@@ -166,29 +146,11 @@ class TabPresupuestoController extends Controller
 		return json_encode($result);
 	}
 
-	/**
-	 * Elimina ambiente y sus productos
-	 * Name: presupuesto.eliminaambiente
-	 * 
-	 * @param  Request $request
-	 * @param  Response $response
-	 * @return json
-	 */
-	public function eliminaAmbiente($request, $response)
+	private function _setImporteComprobante($req)
 	{
-		$result = ['status' => 'error'];
-
-		$cantAmbDel = Ambiente::where('idComprobante', '=', $request->getParam('idComprobante'))
-								->where('idAmbiente', '=',  $request->getParam('idAmbiente'))
-								->delete();
-		$cantProdsDel = ProductoAmbiente::where('idComprobante', '=', $request->getParam('idComprobante')) 
-										->where('idAmbiente', '=',  $request->getParam('idAmbiente'))
-										->delete();
-		if ($cantAmbDel > 0 || $cantProdsDel > 0) {
-			$result = ['status' => 'ok'];
-		}
-
-		return json_encode($result);
+		$comprob = Comprobante::find( (int)$req->getParam('idComprobante') );
+		$comprob->importe = $this->utils->convStrToFloat( $req->getParam('importePresup') );
+		$comprob->save();
 	}
 
 	/**
@@ -219,31 +181,21 @@ class TabPresupuestoController extends Controller
 	 */
 	private function _dataAmbientes($req)
 	{
-		$datos = $req->getParams();
 		$temp = $retorno = [];
-		$cont = 1;
+		$ambientes = $req->getParam('ambientes');
 
-		foreach ($datos as $key => $value) {
+		foreach ($ambientes as $value) {
+			$temp['id']            = (int) $value['id'];
+			$temp['idComprobante'] = (int) $value['idComprobante'];
+			$temp['idAmbiente']    = (int) $value['idAmbiente'];
+			$temp['titulo']        = $value['titulo'];
+			$temp['concepto']      = $value['concepto'];
+			$temp['importe']       = $value['importe'];		//$this->utils->convStrToFloat($value['importe']);
+			$temp['eliminado']     = $value['eliminado'];
 
-			switch ($key) {
-				case 'idAmb_'.$cont:
-					$temp['idAmbiente'] = $value;
-					break;
-				case 'titulo_'.$cont:
-					$temp['titulo'] = $value;
-					break;
-				case 'concepto_'.$cont:
-					$temp['concepto'] = $value;
-					break;
-				case 'importe_'.$cont:
-					$temp['importe'] = $value;
-					$temp['idComprobante'] = $req->getParam('idComprobante');
-					$cont++;
-					$retorno[] = $temp;
-					$temp = [];
-					break;
-			}
+			$retorno[] = $temp;
 		}
+
 		return $retorno;
 	}
 
@@ -259,26 +211,26 @@ class TabPresupuestoController extends Controller
 		$temp = $retorno = [];
 
 		foreach ($prods as $value) {
+			$temp['id']             = $value['id'];
 			$temp['idComprobante']  = $req->getParam('idComprobante');
-			$temp['idAmbiente']     = (int)$value['idAmbiente'];
-			$temp['idProducto']     = (int)$value['idProducto'];
-			$temp['idTipoProducto'] = (int)$value['idTipoProducto'];
+			$temp['idAmbiente']     = $value['idAmbiente'];
+			$temp['idProducto']     = $value['idProducto'];
+			$temp['idTipoProducto'] = $value['idTipoProducto'];
 			$temp['producto']       = $value['producto'];
 			$temp['tipoProducto']   = $value['tipoProducto'];
 			$temp['concepTrab']     = $value['concepTrab'];
-			$temp['altoTrab']       = $this->utils->convStrToFloat($value['altoTrab']);
-			$temp['anchoTrab']      = $this->utils->convStrToFloat($value['anchoTrab']);
-			$temp['mts2Trabajo']    = $this->utils->convStrToFloat($value['mts2Trabajo']);
-			$temp['altoPlaca']      = $this->utils->convStrToFloat($value['altoPlaca']);
-			$temp['anchoPlaca']     = $this->utils->convStrToFloat($value['anchoPlaca']);
-			$temp['cantPlacAlto']   = (int)$value['cantPlacAlto'];
-			$temp['cantPlacAncho']  = (int)$value['cantPlacAncho'];
-			$temp['cantPlacas']     = (int)$value['cantPlacas'];
-			$temp['mts2Placas']     = $this->utils->convStrToFloat($value['mts2Placas']);
-			$temp['precioXmt2']     = $this->utils->convStrToFloat($value['precioXmt2']);
-			$temp['importeTotal']   = $this->utils->convStrToFloat($value['importeTotal']);
-			$temp['idEstadoItem']   = $this->utils->convStrToFloat($value['idEstadoItem']);
-			//$temp['estadoItem']     = $value['estadoItem'];
+			$temp['altoTrab']       = $value['altoTrab'];		// $this->utils->convStrToFloat($value['altoTrab']);
+			$temp['anchoTrab']      = $value['anchoTrab'];		// $this->utils->convStrToFloat($value['anchoTrab']);
+			$temp['mts2Trabajo']    = $value['mts2Trabajo'];	// $this->utils->convStrToFloat($value['mts2Trabajo']);
+			$temp['altoPlaca']      = $value['altoPlaca'];		// $this->utils->convStrToFloat($value['altoPlaca']);
+			$temp['anchoPlaca']     = $value['anchoPlaca'];		// $this->utils->convStrToFloat($value['anchoPlaca']);
+			$temp['cantPlacAlto']   = $value['cantPlacAlto'];
+			$temp['cantPlacAncho']  = $value['cantPlacAncho'];
+			$temp['cantPlacas']     = $value['cantPlacas'];
+			$temp['mts2Placas']     = $value['mts2Placas'];		// $this->utils->convStrToFloat($value['mts2Placas']);
+			$temp['precioXmt2']     = $value['precioXmt2'];		// $this->utils->convStrToFloat($value['precioXmt2']);
+			$temp['importeTotal']   = $value['importeTotal'];	// $this->utils->convStrToFloat($value['importeTotal']);
+			$temp['idEstadoItem']   = $value['idEstadoItem'];	// $this->utils->convStrToFloat($value['idEstadoItem']);
 
 			$retorno[] = $temp;
 		}

@@ -1,0 +1,170 @@
+{# Datos de tab Presupuesto #}
+
+<div class="row">
+	<div class="col offset-1 mt-2 mb-0">
+		<h4 class="font-weight-bold text-muted">Datos Presupuesto</h4>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col offset-1">
+		<hr class="mt-0"/>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-4 offset-2">
+		<p class="data">Empleado que lo realizó:&nbsp;<strong>{{ dataTab.presupuesto.apellidoNombre }}</strong>&nbsp;({{ dataTab.presupuesto.idEmpleado }})</p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-4 offset-2">
+		<p class="data">Fecha presupuesto:&nbsp;<strong>{{ dataTab.presupuesto.fechaPresup|date("d/m/Y") }}</strong></p>
+	</div>
+	<div class="col-3 offset-1">
+		<p class="data">Fecha vencimiento:&nbsp;<strong>{{ dataTab.presupuesto.fechaVencimiento ? dataTab.presupuesto.fechaVencimiento|date("d/m/Y") : '' }}</strong></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-8 offset-2 mt-2">
+		<p class="font-weight-bold pl-1 mb-0">Total metros</p>
+		<hr class="mt-0 mb-1"/>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col offset-2">
+		<p class="data">Revestimiento (mts2):&nbsp;<strong>{{ dataTab.presupuesto.totalMts2Revest }}</strong></p>
+	</div>
+	<div class="col">
+		<p class="data">Cielorraso (mts2):&nbsp;<strong>{{ dataTab.presupuesto.totalMts2Cielorraso }}</strong></p>
+	</div>
+	<div class="col">
+		<p class="data">Molduras:&nbsp;<strong>{{ dataTab.presupuesto.totalMtsMolduras }}</strong></p>
+	</div>
+	<div class="col-2"></div>
+</div>
+
+<div class="row">
+	<div class="col-8 offset-2">
+		<hr class="mt-0 mb-2"/>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-8 offset-2">
+		<p class="data">Forma de pago:&nbsp;<strong>{{ dataTab.presupuesto.formaDePago }}</strong></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-4 offset-2 mt-2">
+		<p class="data">Entrega:&nbsp;<strong>$&nbsp;{{ dataTab.presupuesto.entrega|number_format(2, ',', '.') }}</strong></p>
+	</div>
+	<div class="col-4 border border-dark text-white bg-dark">
+		<p class="data text-center dataImporte">Importe:&nbsp;<strong>$&nbsp;{{ dataTab.presupuesto.importePresup|number_format(2, ',', '.') }}</strong></p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-10 offset-1 mt-1">
+		<hr />
+	</div>
+</div>
+
+{% if dataTab.ambientes[0].idAmbiente %}
+
+	<div class="row">
+		<div class="col offset-1 mt-1 mb-0 pl-4">
+			<h6 class="font-weight-bold text-muted pl-2">Ambientes</h6>
+		</div>
+	</div>
+
+	{# for ambiente #}
+	{% for amb in dataTab.ambientes %}
+		<div class="row">
+			<div class="col-10 offset-1">
+				<hr class="mt-0 mb-2"/>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-4 offset-2">
+				<p class="data">Título:&nbsp;<strong>{{ amb.titulo }}</strong></p>
+			</div>
+			<div class="col-4">
+				<p class="data r">Concepto:&nbsp;<strong>{{ amb.concepto }}</strong></p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-10 offset-1 mt-2">
+				<table id="table-productos" class="table table-bordered table-sm mb-1">
+					<thead>
+						<tr>
+							<th colspan="4" class="text-center">Grilla Productos</th>
+							<th colspan="3" class="text-center">Medidas Trabajo</th>
+							<th colspan="4" class="text-center">Medidas Placas</th>
+							<th colspan="4" class="text-center">Cantidad Placas</th>
+							<th></th>
+						</tr>
+						<tr>
+							<th class="head2">Tipo Prod.</th>
+							<th class="head2">Id</th>
+							<th class="head2">Descripción</th>
+							<th class="head2">Concepto</th>
+							<th class="head2 cellRight">Ancho</th>
+							<th class="head2 cellRight">Alto</th>
+							<th class="head2 cellRight">Mts/2</th>
+							<th class="head2 cellRight">Ancho</th>
+							<th class="head2 cellRight">Alto</th>
+							<th class="head2 cellRight">Mts/2</th>
+							<th class="head2 cellRight">Precio</th>
+							<th class="head2 cellRight">En Ancho</th>
+							<th class="head2 cellRight">En Alto</th>
+							<th class="head2 cellRight">Total</th>
+							<th class="head2 cellRight">$ Total</th>
+							<th class="head2 cellRight">Estado Item</th>
+						</tr>
+					</thead>
+					<tbody id="idBodyTablaProds">
+						{% for prod in dataTab.productos %}
+							{% if prod.idAmbiente == amb.idAmbiente %}
+								<tr class="fontBodyTable">
+									<td>{{ prod.tipoProducto }}</td>
+									<td class="cellRight">{{ prod.idProducto }}</td>
+									<td>{{ prod.producto }}</td>
+									<td>{{ prod.concepTrab }}</td>
+									<td class="cellRight">{{ prod.anchoTrab|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.altoTrab|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.mts2Trabajo|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.anchoPlaca|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.altoPlaca|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.mts2Placas|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.precioXmt2|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.cantPlacAncho }}</td>
+									<td class="cellRight">{{ prod.cantPlacAlto }}</td>
+									<td class="cellRight">{{ prod.cantPlacas }}</td>
+									<td class="cellRight">$&nbsp;{{ prod.importeTotal|number_format(2, ',', '.')  }}</td>
+									<td class="cellRight">{{ prod.descripcion }}</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="row mr-1">
+			<div class="col-4 offset-7 border border-dark mt-3">
+				<p class="data text-center p-1">Importe ambiente:&nbsp;<strong>$&nbsp;{{ amb.importe|number_format(2, ',', '.') }}</strong></p>
+			</div>
+		</div>
+
+		<br />
+
+	{% endfor %}
+
+{% endif %}

@@ -19,14 +19,22 @@
 .lblPresup {
 	padding-top: 4px !important;
 	margin-bottom: 2px !important;
-	margin-right: 12px !important;
+	/*margin-right: 12px !important;*/
+	font-size: 14px !important;
+}
+.lblRegistro {
+	padding-top: 4px;
+	margin-bottom: 2px;
 	font-size: 14px !important;
 }
 .labelOT {
 	font-size: 14px !important;
 	padding-top: 6px !important;
 }
-#btnConfirma, #btnCancela, #btnImprime { 
+#btnConfirma, #btnCancela, #btnImprimeRegistro {
+	width: 100px;
+}
+#btnImprimePresupuesto, #btnImprimeOrden {
 	width: 100px;
 }
 #btnAgregarItem {
@@ -120,4 +128,9 @@ button:disabled {
 }
 #btnAgregaExtra {
 	margin-top: 34px;
+}
+.preguntas {
+	font-size: 14px !important;
+	margin: 0 0;
+	
 }

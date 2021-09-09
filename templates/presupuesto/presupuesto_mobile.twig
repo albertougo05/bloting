@@ -26,10 +26,9 @@
 		<form id="form_comprob">
 			{# Para CSRF control #}
 			{{ csrf.field | raw }}
-			<input type="hidden" name="id" id="id">
-			<input type="hidden" name="nroComprobante" id="nroComprobante">
-			<input type="hidden" name="id_cliente" id="id_cliente" value="0">
-			<input type="hidden" name="importe" id="importe">
+			<input type="hidden" name="id" id="id" value="{{ data.comprobante.id }}">
+			<input type="hidden" name="id_cliente" id="id_cliente" value="{{ data.comprobante.id_cliente }}">
+			<input type="hidden" name="importe" id="importe" value="{{ data.comprobante.importe }}">
 
 			<div class="row">
 				{# SUCURSAL #}
@@ -39,16 +38,20 @@
 				<div class="col-5 mt-3">
 					<select class="form-control form-control-sm" id="idSucursal" name="idSucursal">
 						{% for suc in sucursales %}
-							<option value="{{ suc.id }}">{{ suc.localidad }} ({{ suc.nroSucursal }})</option>
+							<option 
+								value="{{ suc.id }}"
+								{% if suc.id == data.comprobante.idSucursal %} selected {% endif %}>
+								{{ suc.localidad }} ({{ suc.nroSucursal }})
+							</option>
 						{% endfor %}
 					</select>
 				</div>
 				{# ID PRESUPUESTO #}
 				<div class="col-1 mt-3 col-label">
-					<label class="lblPresup" for="idComprobPant">ID</label>
+					<label class="lblPresup" for="nroComprobante">ID</label>
 				</div>
 				<div class="col-3 mt-3">
-					<input type="text" class="form-control form-control-sm text-right" id="idComprobPant" name="idComprobPant" disabled="true">
+					<input type="text" class="form-control form-control-sm text-right" id="nroComprobante" name="nroComprobante" value="{{ data.comprobante.nroComprobante }}" readonly>
 				</div>						
 			</div>
 			<div class="row">
@@ -57,7 +60,7 @@
 					<label class="lblPresup" for="fecha">Fecha</label>
 				</div>
 				<div class="col-5 mt-2">
-				    <input type="date" class="form-control form-control-sm" id="fecha" name="fecha">
+				    <input type="date" class="form-control form-control-sm" id="fecha" name="fecha" value="{{ data.comprobante.fecha }}">
 				</div>
 			</div>
 
@@ -71,7 +74,11 @@
 				<div class="col-8 mt-2">
 					<select class="form-control form-control-sm font-weight-bold" id="idTipoComprobante" name="idTipoComprobante">
 						{% for tipo in tiposCompr %}
-							<option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+							<option 
+								value="{{ tipo.id }}"
+								{% if tipo.id == data.comprobante.idTipoComprobante %} selected {% endif %}>
+								{{ tipo.descripcion }}
+							</option>
 						{% endfor %}
 					</select>
 				</div>
@@ -84,7 +91,11 @@
 				<div class="col-8 mt-2">
 					<select class="form-control form-control-sm" id="idEstado" name="idEstado">
 						{% for estado in estadosCompr %}
-							<option value="{{ estado.id }}">{{ estado.descripcion }}</option>
+							<option 
+								value="{{ estado.id }}"
+								{% if estado.id == data.comprobante.idEstado %} selected {% endif %}>
+								{{ estado.descripcion }}
+							</option>
 						{% endfor %}
 					</select>
 				</div>
@@ -106,7 +117,7 @@
 											<label class="lblPresup" for="fechaUltimoCambio">Modificado</label>
 										</div>
 										<div class="col-8 mt-1">
-										    <input type="date" class="form-control form-control-sm" id="fechaUltimoCambio" name="fechaUltimoCambio" disabled>
+										    <input type="date" class="form-control form-control-sm" id="fechaUltimoCambio" name="fechaUltimoCambio" value="{{ data.comprobante.fechaUltimoCambio }}" readonly>
 										</div>
 									</div>
 									<div class="row">
@@ -115,7 +126,7 @@
 											<label class="lblPresup" for="fechaAnulaoElimina">Anulado</label>
 										</div>
 										<div class="col-8 mt-2">
-										    <input type="date" class="form-control form-control-sm" id="fechaAnulaoElimina" name="fechaAnulaoElimina" disabled>
+										    <input type="date" class="form-control form-control-sm" id="fechaAnulaoElimina" name="fechaAnulaoElimina" value="{{ data.comprobante.fechaAnulaoElimina }}" readonly>
 										</div>
 									</div>
 
@@ -132,7 +143,7 @@
 				{# NOMBRE #} 	
 				<div class="col-10 offset-1 mt-1">
 					<div class="input-group input-group-sm mt-2">
-    					<input id="nombre" name="nombre" class="form-control form-control-sm font-weight-bold" type="text" autocomplete="off" spellcheck="false" placeholder="APELLIDO Nombre">
+    					<input id="nombre" name="nombre" class="form-control form-control-sm font-weight-bold" type="text" autocomplete="off" spellcheck="false" placeholder="APELLIDO Nombre" value="{{ data.comprobante.nombre }}">
 						<div class="input-group-append input-group-sm">
 							<button class="btn btn-sm btn-primary" type="button" id="btnBuscarCli" data-toggle="tooltip" data-placement="top" title="Buscar cliente">Buscar</button>
 						</div>
@@ -142,7 +153,7 @@
 			<div class="row">
 				{# DOMICILIO #} 	
 				<div class="col-10 offset-1 mt-2">
-    				<input id="domicilio" name="domicilio" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Domicilio">
+    				<input id="domicilio" name="domicilio" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Domicilio" value="{{ data.comprobante.domicilio }}">
     			</div>
 			</div>
 
@@ -150,7 +161,7 @@
 				<div class="row">
 					{# LOCALIDAD #} 	
 					<div class="col-10 offset-1 mt-2">
-	    				<input id="localidad" name="localidad" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Localidad">
+	    				<input id="localidad" name="localidad" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Localidad" value="{{ data.comprobante.localidad }}">
 	    			</div>
 				</div>
 				<div class="row">
@@ -158,7 +169,11 @@
 					<div class="col-10 offset-1 mt-2">
 						<select class="form-control form-control-sm" id="provincia" name="provincia">
 							{% for prov in provincias %}
-								<option value="{{ prov.nombre }}">{{ prov.nombre }}</option>
+								<option 
+									value="{{ prov.nombre }}"
+									{% if prov.nombre == data.comprobante.provincia %} selected {% endif %}>
+									{{ prov.nombre }}
+								</option>
 							{% endfor %}
 						</select>
 					</div>
@@ -167,44 +182,66 @@
 					{# PAIS #}
 					<div class="col-10 offset-1 mt-2">
 						<select class="form-control form-control-sm" id="pais" name="pais">
-								<option value="1">Argentina</option>
-								<option value="2">Uruguay</option>
+							<option 
+								value="1"
+								{% if data.comprobante.pais == 1 %} selected {% endif %}>
+								Argentina
+							</option>
+							<option 
+								value="2"
+								{% if data.comprobante.pais == 2 %} selected {% endif %}>
+								Uruguay
+							</option>
 						</select>
 					</div>
 				</div>
 				<div class="row">
 					{# CODIGO POSTAL #}
 					<div class="col-10 offset-1 mt-2">
-    					<input id="codPostal" name="codPostal" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cod. Postal">
+    					<input id="codPostal" name="codPostal" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cod. Postal" value="{{ data.comprobante.codPostal }}">
 					</div>
 				</div>
 				<div class="row">
 					{# TELEFONO #}
 					<div class="col-10 offset-1 mt-2">
-    					<input id="telefono" name="telefono" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Teléfono">
+    					<input id="telefono" name="telefono" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Teléfono" value="{{ data.comprobante.telefono }}">
 					</div>
 				</div>
 				<div class="row">
 					{# CELULAR #}
 					<div class="col-10 offset-1 mt-2">
-    					<input id="celular" name="celular" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Celular">
+    					<input id="celular" name="celular" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Celular" value="{{ data.comprobante.celular }}">
+					</div>
+				</div>
+				<div class="row">
+					{# CONDICION FISCAL #}
+					<div class="col-10 offset-1 mt-2">
+						<select class="form-control form-control-sm" id="condicionFiscal" name="condicionFiscal">
+							{% for cond in condFiscal %}
+								<option 
+									value="{{ cond }}"
+									{% if data.comprobante.condicionFiscal == cond %} selected {% endif %}>
+									{{ cond }}
+								</option>
+							{% endfor %}
+						</select>
 					</div>
 				</div>
 				<div class="row">
 					{# CUIT / DNI #}
 					<div class="col-10 offset-1 mt-2">
-    					<input id="cuitdni" name="cuitdni" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cuit/DNI">
+    					<input id="cuitdni" name="cuitdni" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Cuit/DNI" value="{{ data.comprobante.cuitdni }}">
 					</div>
 				</div>
 				<div class="row">
 					{# CONTACTO #} 	
 					<div class="col-10 offset-1 mt-2">
-	    				<input id="contacto" name="contacto" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Contacto">
+	    				<input id="contacto" name="contacto" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="Contacto" value="{{ data.comprobante.contacto }}">
 	    			</div>
 
 					{# E-MAIL #}
 					<div class="col-10 offset-1 mt-2">
-    					<input id="email" name="email" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="E-mail">
+    					<input id="email" name="email" class="form-control form-control-sm" type="text" autocomplete="off" spellcheck="false" placeholder="E-mail" value="{{ data.comprobante.email }}">
 					</div>
 				</div>
 			</div>  {# /end collapse #}
@@ -216,7 +253,40 @@
     			</div>
     		</div>
 
+			<div class="row">
+				<div class="col">
+					<hr>
+				</div>
+			</div>
+
+			<div class="row">
+				{# OBSERVACIONES GENERALES #}
+				<div class="col m-1">
+					<label class="lblPresup" for="observaciones">Observaciones Generales</label>
+					<textarea class="form-control" id="observaciones" name="observaciones" rows="2">{{ data.comprobante.observaciones }}</textarea>
+				</div>
+			</div>
+
 		</form>
+
+		<div class="row">
+			<div class="col mt-2">
+				<hr>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col mb-3 d-flex flex-row-reverse">
+	  			<button id="btnConfirma" class="btn btn-success btn-sm mr-2">Confirmar</button>
+	  			<a id="btnCancela" class="btn btn-secondary btn-sm mr-3" href="{{ path_for('presupuesto') }}" role="button">Cancelar</a>
+	  		</div>
+	  	</div>
+
+		<div class="row">
+			<div class="col">
+				{% include 'partes/spinnerGuardar.twig' %}
+			</div>
+		</div>
 
 		<div class="row" id="etiquetas">
 			<div class="col">
@@ -296,39 +366,6 @@
 					</div>
 				</div> 		{# /end acordion #}
 
-
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col">
-				<hr>
-			</div>
-		</div>
-
-		<div class="row">
-			{# OBSERVACIONES GENERALES #}
-			<div class="col m-1">
-				<label class="lblPresup" for="observGenerales">Observaciones Generales</label>
-				<textarea class="form-control" id="observGenerales" name="observGenerales" rows="2"></textarea>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col mt-2">
-				<hr>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-sm-8 mb-3">
-	  			<button id="btnConfirma" class="btn btn-primary btn-sm ml-2">Confirmar</button>
-	  			<a id="btnCancela" class="btn btn-secondary btn-sm ml-3" href="{{ path_for('presupuesto') }}" role="button">Cancelar</a>
-	  			<button id="btnImprime" class="btn btn-success btn-sm ml-3" disabled="true">Generar PDF</button>
-	  		</div>
-
-			<div class="col-4">
-				{% include 'partes/spinnerGuardar.twig' %}
 			</div>
 		</div>
 
@@ -345,6 +382,7 @@
 	<script src="{{ base_url() }}/js/jquery.inputmask.bundle.min.js"></script>
 	<script src="{{ base_url() }}/js/toastr.min.js"></script>
 	<script src="{{ base_url() }}/js/jquery-confirm.min.js"></script>
+	<script src="{{ base_url() }}/js/moment-locales.min.js"></script>
 	<script src="{{ base_url() }}/js-app/common.js"></script>
 
     <script type="text/javascript">
@@ -363,14 +401,12 @@
     	    pathPresup:       "{{ path_for('presupuesto') }}",
     	    pathPresupBuscar: "{{ path_for('presupuesto.buscar') }}",
 
-    	    pathGetComprob:   "{{ path_for('presupuesto.getcomprobante', {id: ''}) }}",
-    	    pathGetRegistro:  "{{ path_for('presupuesto.getregistro', {id: ''}) }}",
-    	    pathGetPresupuesto:"{{ path_for('presupuesto.getpresupuesto', {id: ''}) }}",
     	    pathGetAmbientes:  "{{ path_for('presupuesto.getambientes', {id: ''}) }}",
     	    pathGetProductos:  "{{ path_for('presupuesto.getproductos', {id: ''}) }}",
-    	    pathGetOrdenTrab:  "{{ path_for('presupuesto.getordentrabajo', {id: ''}) }}",
+
     	    pathGetFotos:      "{{ path_for('presupuesto.getfotos', {id: ''}) }}",
     	    pathGetExtras:      "{{ path_for('presupuesto.getextras', {id: ''}) }}",
+    	    pathGetIdComprob:  "{{ path_for('presupuesto.getidcomprobante', {id: ''}) }}",
 
     	    pathImprimir:     "{{ path_for('presupuesto.imprimir') }}",
     	    pathBuscarCliente:"{{ path_for('cliente.buscar') }}",
@@ -378,10 +414,9 @@
     	    pathBorrarFoto:   "{{ path_for('presupuesto.borrarfoto') }}",
     	    pathEliminaAmb:   "{{ path_for('presupuesto.eliminaambiente', {id: ''}) }}",
     	    fecha:            "{{ fecha }}",
-    	    id_presup:        "{{ id_presup }}",
     	    isMobile:		  "{{ isMobile }}",
     	    guardado:         false,
-    	    guardadoDeTabs:   { registro: true, 
+    	    guardadoDeTabs:   { registro: true,
     	    					presupuesto: true,
     	    					ordenTrabajo: true,
     	    					fotos: true,
@@ -390,6 +425,8 @@
     	    listaDeExtras:    [],
      	    productos:        [],
     	    estadosItem:      [],
+    	    id_registro:      "{{ id_registro }}",
+    	    nroComprobante:   "{{ nroComprobante }}"
     	};
 
 		let obj = {};
@@ -414,5 +451,5 @@
 
 	</script>
 
-	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.3.1"></script>
+	<script type="module" src="{{ base_url() }}/js-app/presupuesto/presupuesto.js?ver=0.3.2"></script>
 {% endblock %}

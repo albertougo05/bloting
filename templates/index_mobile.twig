@@ -1,0 +1,48 @@
+{% extends 'base_mobile.twig' %}
+
+{% block head %}
+  {{ parent() }}
+
+  <link rel="stylesheet" href="{{ base_url() }}/css/animate.min.css">
+  <style type="text/css" media="screen">
+    .main-menu-container {
+      padding: 20px;
+      margin-top: 80px;
+    }
+  </style>
+{% endblock %}
+
+{% block title %}{{ titulo }}{% endblock %} 
+
+{% block navigation %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+	  {% include 'partes/nav-brand.twig' %}
+
+    <div class="navbar" id="navbarSupportedContent">
+
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#" id="navbarDropdown" role="button">Usuario:&nbsp;{{ auth.user.Usuario }}</a>
+        </li>
+      </ul>
+
+    </div>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="tridimLogo animate__animated animate__rubberBand">
+    <img src="img/tridimLogo.png" alt="tridimLogo" width="80" height="80">
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-10 offset-1 main-menu-container">
+        <a href="{{ path_for('presupuesto') }}" class="btn btn-primary btn-lg btn-block mb-3" role="button">Presupuesto</a>
+        <a href="{{ path_for('cliente') }}" class="btn btn-primary btn-lg btn-block mb-3" role="button">Clientes</a>
+        <a href="{{ path_for('index') }}" class="btn btn-primary btn-lg btn-block" role="button">Salir</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

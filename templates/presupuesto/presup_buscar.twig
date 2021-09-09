@@ -82,6 +82,7 @@
 		                    <th scope="col">Nombre</th>
 		                    <th scope="col">Domicilio</th>
 		                    <th scope="col">Localidad</th>
+		                    <th scope="col">Sucursal</th>
 		                  </tr>
 		                </thead>
 		                <tbody class="body-half-screen">
@@ -92,6 +93,7 @@
 		      					    <td id="nomb" class="filter-cell">{{ presup.nombre }}</td>
 		      					    <td>{{ presup.domicilio }}</td>
 		                            <td>{{ presup.localidad }}</td>
+		                            <td>{{ presup.sucursal }}</td>
 		                        </tr>
 		                    {% endfor %}
 		                </tbody>
@@ -132,7 +134,7 @@
 					                         autofocus:  true });
 
 				// Evento click para seleccionar y redireccionar 
-				$('#tablaBuscar tr').on('click', function(){
+				$('#tablaBuscar tr').on('click', function() {
 	  				_idPresup = $(this).find('td:first').text();
 		  			// Cierra el popup y vuelve a ventana parent
 		  			_cerrar = true;

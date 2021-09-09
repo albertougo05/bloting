@@ -3,11 +3,8 @@ import { FOTOS } from './manejoFotos.js';
 import ManejoAmbientes from './ManejoAmbientes.js';
 import IngresoProds from './IngresoProds.js';
 import guardarComprob from './guardarComprob.js';
-import buscarComprobante from './buscarComprobante.js';
-import buscarRegistro from './buscarRegistro.js';
-import buscarPresupuesto from './buscarPresup.js';
-import buscarOrdenTrabajo from './buscarOrdenTrabajo.js';
 import uiDeExtras from './uiDeExtras.js';
+
 
 //
 // presupuesto.js
@@ -15,20 +12,37 @@ import uiDeExtras from './uiDeExtras.js';
 
 (function init() {
 
-	$('#fecha').val(PRESUP.fecha);		// Inicializo las fechas
-	$('#fechaUltModif').val(PRESUP.fecha);
-	$('#fechaTentativa').val(PRESUP.fecha);
-	$('#fechaPresupuesto').val(PRESUP.fecha);
+	if (PRESUP.id_registro == 0) {
 
-	$('#id').val(PRESUP.id_presup);
-	$('#nroComprobante').val(PRESUP.id_presup);
-	$('#idComprobPant').val(PRESUP.id_presup);
-	$('#btnMasDatos').html('Más datos...');
-	$('#provincia').val('Córdoba'); 
+		moment.locale('es');
+		const proximoDiaHabil = () => {
+			const diaSem = moment().format('dddd');
+			let diaHabil = moment().add(1, 'days').format('YYYY-MM-DD');
 
-	if (PRESUP.isMobile)
-		console.log("Es mobile !");
-	else console.log("NO es mobile !");
+			if (diaSem == 'sábado') {
+				diaHabil = moment().add(3, 'days').format('YYYY-MM-DD');
+			} 
+			if (diaSem == 'domingo') {
+				diaHabil = moment().add(2, 'days').format('YYYY-MM-DD');
+			} 
+
+			return diaHabil;
+		};
+
+		$('#fecha').val(PRESUP.fecha);	// Inicializo las fechas
+		$('#fechaTentativa').val(proximoDiaHabil);
+		$('#fechaPresupuesto').val(PRESUP.fecha);
+
+		$('#id').val(PRESUP.id_registro);
+		$('#nroComprobante').val(PRESUP.nroComprobante);
+
+		$('#btnMasDatos').html('Más datos...');
+		$('#provincia').val('Córdoba'); 
+
+		if (PRESUP.isMobile)
+			console.log("Es mobile !");
+		else console.log("NO es mobile !");
+	}
 
 })();
 
@@ -78,6 +92,13 @@ PRESUP.toastrSuccessOptions = {
 
 PRESUP.winBuscar = false;    // Variable para saber que está abierta la ventana de búsqueda
 PRESUP.objWinBuscar = {};    // Ventana de búsqueda
+
+/**
+ * Agrega un cero a la izquierda
+ * 
+ * @param  {[int]} num [numero]
+ * @return {[string]}     [numero con cero a la izquierda]
+ */
 PRESUP.padCero = (num) => {
 	let str = String(num);
 
@@ -145,6 +166,9 @@ PRESUP.onChangeSelectEstadoItem = objSelect => {
 };
 
 PRESUP._updateMedidas = function (medidas) {		// medidas = {totalMts2Revest, totalMts2Cielorraso, totalMtsMolduras}
+
+console.log('Medidas pasadas:', medidas);
+
 	const input_totalMts2Revest     = document.getElementById('totalMts2Revest');
 	const input_totalMts2Cielorraso = document.getElementById('totalMts2Cielorraso');
 	const input_totalMtsMolduras    = document.getElementById('totalMtsMolduras');
@@ -157,7 +181,6 @@ PRESUP._updateMedidas = function (medidas) {		// medidas = {totalMts2Revest, tot
 	input_totalMts2Cielorraso.value = totalMts2Cielorraso + medidas.totalMts2Cielorraso; 
 	input_totalMtsMolduras.value    = totalMtsMolduras + medidas.totalMtsMolduras;
 }
-
 
 
 
@@ -176,11 +199,9 @@ PRESUP.onClickBtnSalvarPresup = function () {
 	const guardaOk = guardarComprob.salvarPresup(PRESUP.pathGuardarPresup);
 
 	if (guardaOk) {		// Salvar ambientes y sus productos
-		// Eliminar productos y ambientes eliminados
-		PRESUP._ambientes.eliminarAmbienteYProdsDelDisco(PRESUP.pathEliminaAmb, PRESUP.id_presup);
-		PRESUP._ambientes.salvarAmbientes(PRESUP.pathGuardarAmbien, PRESUP.id_presup);
-		PRESUP._ingresoProds.salvarProductosDeAmbientes(PRESUP.pathGuardarProduc, PRESUP.id_presup);
-		PRESUP.guardadoDeTabs.presupuesto = true;
+		PRESUP._ambientes.salvarAmbientes(PRESUP.pathGuardarAmbien, PRESUP.id_registro);
+		PRESUP._ingresoProds.salvarProductosDeAmbientes(PRESUP.pathGuardarProduc, PRESUP.id_registro);
+
 	} else { 
 		toastr.error('No se guardó presupuesto !', "ERROR, intente cerrar la aplicación !"); 
 	}
@@ -192,10 +213,11 @@ PRESUP.onClickBtnSalvarPresup = function () {
 PRESUP.onClickBtnGuardarOrdenT = function () {
 	guardarComprob.salvarOrdenTrab( 
 		PRESUP.pathGuardarOrdTrab, 
-		PRESUP.id_presup
+		PRESUP.id_registro
 	);
 	PRESUP.guardadoDeTabs.ordenTrabajo = true;
 }
+
 
 /**
  * CLICK GUARDAR TAB FOTOS
@@ -204,10 +226,11 @@ PRESUP.onClickBtnGuardarFotos = function () {
 	guardarComprob.salvarFotos(
 		PRESUP.listaDeFotos, 
 		PRESUP.pathGuardarListaFotos,
-		PRESUP.id_presup
+		PRESUP.id_registro
 	);
 	PRESUP.guardadoDeTabs.fotos = true;
 }
+
 
 /**
  * CLICK GUARDAR TAB EXTRAS
@@ -216,10 +239,11 @@ PRESUP.onClickBtnGuardarExtras = function () {
 	guardarComprob.salvarExtras(
 		PRESUP.listaDeExtras, 
 		PRESUP.pathGuardarExtras,
-		PRESUP.id_presup
+		PRESUP.id_registro
 	);
 	PRESUP.guardadoDeTabs.extras = true;
 }
+
 
 /**
  * CLICK BOTON AGREGAR EXTRA
@@ -234,6 +258,7 @@ PRESUP.onClickBtnAgregarExtra = function () {
 		uiDeExtras.ingresoTabla(obj, this.listaDeExtras.length);
 	}
 }
+
 
 /**
  * CLICK BOTON BORRAR EXTRA
@@ -303,7 +328,7 @@ PRESUP.winBuscarPresup = function () {		// Crea ventana para buscar presupuesto 
 			let idPresup = '';
 
 			if (cerrar) {
-				// console.log("Se cierra la ventana buscar... (" + this._idPresup + ")");
+				//console.log("Se cierra la ventana buscar... (" + this._idPresup + ")");
 				this.close();
 				location.assign( PRESUP.pathPresup + "?idComp=" + this._idPresup );
 			}
@@ -314,6 +339,21 @@ PRESUP.winBuscarPresup = function () {		// Crea ventana para buscar presupuesto 
 	}
 	return null;
 };
+
+/**
+ * 
+ * BOTON IMPRIMIR EN TABS
+ * (Común a todos los tabs)
+ *
+ * @param string nombre del tab
+ */
+PRESUP.onClickBtnImprimir = function (tab) {
+	const id = document.getElementById('id').value;
+    let paramString = '?id=' + id;
+    paramString += '&tab=' + tab;
+	window.open( PRESUP.pathImprimir + paramString, '_blank');
+}
+
 
 
 
@@ -348,6 +388,20 @@ $( function () {
         rightAlign: false,
         unmaskAsNumber: true, 
         oncleared: function () { self.value = ''; }
+    });
+
+    // Click select idSucursal (busca id comprobante disponible de sucursal seleccionada)
+    $('#idSucursal').change( async function (e) {
+
+    	console.log('Id sucursal:', e.target.value);
+    	// Buscar id de comprobante de la sucursal...
+        const res = await fetch(PRESUP.pathGetIdComprob + e.target.value);
+        const data = await res.json();
+		//console.log('Nuevo id comprobante:', data.id);
+		PRESUP.nroComprobante = data.id;
+		$('#id').val(0);
+		$('#nroComprobante').val(PRESUP.nroComprobante);
+
     });
 
     // Click boton mas datos mobile
@@ -420,12 +474,12 @@ $( function () {
 		return null;
 	});
 
-	// Al cambiar fecha de tab presupuesto, cambia la de vencimiento a 30 dias mas
+	// Al cambiar fecha de tab presupuesto, cambia la de vencimiento a 8 dias mas
 	$('input#fechaPresup').change(function(event) {
 		const fecha = $(this).val();
 		const date = new Date(fecha);
 		const copy = new Date(Number(date));
-		copy.setDate(date.getDate() + 31);
+		copy.setDate(date.getDate() + 8);
 		const mes = copy.getMonth() + 1;
 		const dia = copy.getDate();
 		const fechaVenc = copy.getFullYear() + '-' + PRESUP.padCero(mes) + '-' + PRESUP.padCero(dia);
@@ -441,12 +495,6 @@ $( function () {
 	// Click link Buscar presupuesto
 	$('#a_buscar').click(function (e) {
 		PRESUP.winBuscarPresup();
-	});
-
-	// click en boton imprimir
-	$('#btnImprime').click( function(e) {
-	    const paramString = '?id=' + $('#id').val();
-		window.open( PRESUP.pathImprimir + paramString, '_blank');
 	});
 
 	// Change select Comprobante
@@ -465,9 +513,6 @@ $( function () {
 				break;
 		}
 	});
-
-	// On Blur conceptos
-	$('textarea ').onB
 
 	// Al desplegar la etiqueta (en mobile)...
 	$('#acordionTipoComprobante').on('show.bs.collapse', function () {
@@ -518,6 +563,7 @@ $( function () {
 			PRESUP._ingresoProds.setProductoSeleccionado();
 			const idAmbSel = PRESUP._ingresoProds.getIdAmbienteSelec(),
 				  importeProd = PRESUP._ingresoProds.getImporteProdSelec();
+
 			PRESUP._ambientes.setImporte( idAmbSel, importeProd);
 			PRESUP._updateMedidas(PRESUP._ingresoProds.getMedidasProdSelec())
 
@@ -533,22 +579,23 @@ $( function () {
 	});
 
 	/**
-	 *
-	 * Si viene el id de comprobante carga los datos de la página
-	 * 
+	 * Si viene el id de comprobante carga datos de Ambientes y productos
+	 * Tambien Fotos y extras
 	 */
-	if (PRESUP.idComprobante > 0) {
-		//console.log('Id Comprobante:', PRESUP.idComprobante);
+	if (PRESUP.id_registro > 0) {
 		PRESUP.guardado = true;		// Para permitir guardar Tabs
-		buscarComprobante(PRESUP.idComprobante, PRESUP.pathGetComprob);
-		PRESUP.id_presup = PRESUP.idComprobante;	// Set el id del comprobante
-		buscarRegistro(PRESUP.idComprobante, PRESUP.pathGetRegistro);
-		buscarPresupuesto(PRESUP.idComprobante, PRESUP.pathGetPresupuesto);
-		PRESUP._ambientes.buscarAmbientes(PRESUP.idComprobante, PRESUP.pathGetAmbientes);
-		PRESUP._ingresoProds.buscarProductos(PRESUP.idComprobante, PRESUP.pathGetProductos);
-		buscarOrdenTrabajo(PRESUP.idComprobante, PRESUP.pathGetOrdenTrab);
-		FOTOS.buscarFotos(PRESUP.idComprobante, PRESUP.pathGetFotos, PRESUP.isMobile);
-		uiDeExtras.buscarExtras(PRESUP.idComprobante, PRESUP.pathGetExtras);
+
+		// Bloquea las opciones de cambiar sucursal
+		$('#idSucursal option:not(:selected)').prop('disabled', true);
+		// Readonly la fecha de creación del comprobante
+		document.getElementById("fecha").readOnly = true; 
+
+		PRESUP._ambientes.buscarAmbientes(PRESUP.id_registro, PRESUP.pathGetAmbientes);
+		PRESUP.guardadoDeTabs.registro = false;
+		PRESUP.guardadoDeTabs.presupuesto = false;
+		PRESUP.guardadoDeTabs.ordenTrabajo = false;		
+		FOTOS.buscarFotos(PRESUP.id_registro, PRESUP.pathGetFotos, PRESUP.isMobile);
+		uiDeExtras.buscarExtras(PRESUP.id_registro, PRESUP.pathGetExtras);
 	}
 
 	// Evento antes de cerrar la ventana

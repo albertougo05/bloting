@@ -31,6 +31,7 @@ class Comprobante extends Model
 		'codPostal',
 		'pais',
 		'cuitdni',
+		'condicionFiscal',
 		'telefono',
 		'celular',
 		'contacto',

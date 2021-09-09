@@ -13,7 +13,11 @@
 				<select class="form-control form-control-sm" id="idEmpleado" name="idEmpleado">
 					<option value="0">Seleccione empleado...</option>
 					{% for empl in empleados %}
-						<option value="{{ empl.id }}">{{ empl.apellidoNombre }}</option>
+						<option 
+							value="{{ empl.id }}"
+							{% if data.registro.idEmpleado == empl.id %} selected {% endif %}>
+							{{ empl.apellidoNombre }}
+						</option>
 					{% endfor %}
 				</select>
 			</div>
@@ -25,26 +29,91 @@
 				<label class="lblPresup" for="detalle">Detalle visita</label> 
 			</div>
 			<div class="col-sm-9 mt-2">
-				<textarea class="form-control" id="detalle" name="detalle" rows="4"></textarea>
+				<textarea class="form-control" id="detalle" name="detalle" rows="4">{{ data.registro.detalle }}</textarea>
 			</div>
 		</div>
 
 		<div class="row">
 			{# FECHA TENTATIVA VISITA #}
-			<div class="col-sm-2 mt-2 col-label">
-				<label class="lblPresup" for="fechaTentativa">Fecha Tentativa Visita</label>
+			<div class="col-2 mt-2 col-label">
+				<label class="lblRegistro" for="fechaTentativa">Tentativa Visita</label>
 			</div>
 			<div class="col-sm-3 mt-2">
-			    <input type="date" class="form-control form-control-sm" id="fechaTentativa" name="fechaTentativa">
+			    <input type="date" 
+			    	   class="form-control form-control-sm" 
+			    	   id="fechaTentativa" 
+			    	   name="fechaTentativa"
+			    	   value="{{ data.registro.fechaTentativa }}">
 			</div>
 			{# FECHA VISITA #}
 			<div class="col-sm-2 offset-sm-1 mt-2 col-label">
 				<label class="lblPresup" for="fechaVisita">Fecha Visita</label>
 			</div>
 			<div class="col-sm-3 mt-2">
-			    <input type="date" class="form-control form-control-sm" id="fechaVisita" name="fechaVisita">
+			    <input type="date" 
+			    	   class="form-control form-control-sm" 
+			    	   id="fechaVisita" 
+			    	   name="fechaVisita"
+			    	   value="{{ data.registro.fechaVisita }}">
 			</div>
 		</div>
+
+		<div class="row">
+			<div class="col ml-4 mr-4 mt-0">
+				<hr />
+			</div>
+		</div>
+
+		{# PREGUNTAS #}
+		<div class="row">
+			<div class="col-2 mt-1 col-label">
+				<label class="lblRegistro" for="queSolicita">¿Qué solicita?</label>
+			</div>
+			<div class="col-sm-9 mt-1">
+			    <input type="text" class="form-control form-control-sm" id="queSolicita" name="queSolicita" value="{{ data.registro.queSolicita }}">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-2 mt-2 col-label">
+				<label class="lblRegistro" for="comoContacto">¿Cómo nos contactó?</label>
+			</div>
+			<div class="col-sm-9 mt-2">
+			    <input type="text" class="form-control form-control-sm" id="comoContacto" name="comoContacto" value="{{ data.registro.comoContacto }}">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-2 mt-2 col-label">
+				<label class="lblRegistro" for="comoConocio">¿Cómo nos conoció?</label>
+			</div>
+			<div class="col-sm-9 mt-2">
+			    <input type="text" class="form-control form-control-sm" id="comoConocio" name="comoConocio" value="{{ data.registro.comoConocio }}">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-2 mt-2 col-label">
+				<label class="lblRegistro" for="conoceSistema">¿Conoce el sistema?</label>
+			</div>
+			<div class="col-sm-9 mt-2">
+			    <input type="text" class="form-control form-control-sm" id="conoceSistema" name="conoceSistema" value="{{ data.registro.conoceSistema }}">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-2 mt-2 col-label">
+				<label class="lblRegistro" for="comoNosComunic">¿Cómo nos comunicamos?</label>
+			</div>
+			<div class="col-sm-9 mt-2">
+			    <input type="text" class="form-control form-control-sm" id="comoNosComunic" name="comoNosComunic" value="{{ data.registro.comoNosComunic }}">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-2 mt-2 col-label">
+				<label class="lblRegistro" for="queUrgencia">¿Qué urgencia tiene?</label>
+			</div>
+			<div class="col-sm-9 mt-2">
+			    <input type="text" class="form-control form-control-sm" id="queUrgencia" name="queUrgencia" value="{{ data.registro.queUrgencia }}">
+			</div>
+		</div>
+
 	</form>
 
 	<div class="row">
@@ -59,6 +128,12 @@
 				type="button" 
 				class="btn btn-sm btn-success">
 			Guardar Registro Visita
+		</button>
+		<button id="btnImprimeRegistro" 
+				class="btn btn-info btn-sm ml-3"
+				onclick="PRESUP.onClickBtnImprimir('registro');"
+				{% if data.registro.idEmpleado == 0 %} disabled {% endif %}>
+			Imprimir
 		</button>
 	</div>
 

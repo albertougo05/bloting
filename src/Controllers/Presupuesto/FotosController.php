@@ -87,7 +87,8 @@ class FotosController extends Controller
 		$result = ['status' => 'error'];
 		$data = $this->_dataFotos($request);
 
-		Foto::where('idComprobante', $request->getParam('idComprobante'))->delete();
+		Foto::where('id', $request->getParam('idComprobante'))
+			->delete();
 
 		foreach ($data as $value) {
 			$foto = Foto::create($value);
@@ -95,7 +96,7 @@ class FotosController extends Controller
 
 		if ($foto) {
 			$result['status'] = 'ok';
-			$this->PresupuestoController->setFechaUltimoCambio($request->getParam('idComprobante'));
+			$this->PresupuestoController->setFechaUltimoCambioYTipoComp($request->getParam('idComprobante'));
 		}
 
 		return json_encode($result);

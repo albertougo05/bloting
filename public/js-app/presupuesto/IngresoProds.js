@@ -102,6 +102,9 @@ class IngresoProds {
 	setProductoSeleccionado() {		// Cuando se selecciona un producto en el modal
 		const obj = this._armarObjProducto();		// Armar objeto del producto
 		// Agregar objeto al array de productos en ambientes
+
+		//console.log('Obj del prod selec:', obj);
+
 		this.productosSelecEnAmbiente.push(obj);
 		// Producto a la lista de productos de pantalla
 		const uiTabProds = new UiTablaProductos(this.estadosItem);
@@ -115,17 +118,22 @@ class IngresoProds {
 					totalMts2Cielorraso: 0,
 					totalMtsMolduras: 0 };
 
+		//console.log('last id:', lastId, 'id tipoProducto:', idTipoProd);
+
+
 		switch (idTipoProd) {
-			case '1':		// Revestimiento
-				obj.totalMts2Revest = COMMONS.realParseFloat( this.productosSelecEnAmbiente[lastId].mts2Placas );
+			case 1:		// Revestimiento
+				obj.totalMts2Revest = this.productosSelecEnAmbiente[lastId].mts2Placas;
 				break;
-			case '2':		// Cielorraso
-				obj.totalMts2Cielorraso = COMMONS.realParseFloat( this.productosSelecEnAmbiente[lastId].mts2Placas );
+			case 2:		// Cielorraso
+				obj.totalMts2Cielorraso = this.productosSelecEnAmbiente[lastId].mts2Placas;
 				break;
-			case '3':		// Molduras
-				obj.totalMtsMolduras = COMMONS.realParseFloat( this.productosSelecEnAmbiente[lastId].mts2Placas );
+			case 3:		// Molduras
+				obj.totalMtsMolduras = this.productosSelecEnAmbiente[lastId].mts2Placas;
 				break;
 		}
+
+		//console.log('obj con medidas prod selec:', obj);
 
 		return obj;
 	}
@@ -162,38 +170,50 @@ class IngresoProds {
 		return this.productosSelecEnAmbiente[lastId].importeTotal;
 	}
 
-
-
 	eliminarProdsAmbiente(id) {
-		this.productosSelecEnAmbiente = this.productosSelecEnAmbiente.filter(prod => prod.idAmbiente !== id);
+		//this.productosSelecEnAmbiente = this.productosSelecEnAmbiente.filter(prod => prod.idAmbiente !== id);
+		this.productosSelecEnAmbiente.map(prod => { 
+			if (prod.idAmbiente == id) {
+				prod.idEstadoItem = 0;
+			}
+		});
 		this.importeAmbEliminado = COMMONS.realParseFloat(document.getElementById('importeAmbiente-' + id).value);
 	}
 
 	actualizarInputsPorElim() {		// Actualiza los inputs al eliminar ambiente
 		const importePresup = COMMONS.realParseFloat(document.getElementById('importePresup').value);
+		const totalMts2Revest = COMMONS.realParseFloat(document.getElementById('totalMts2Revest').value);
+		const totalMts2Cielorraso = COMMONS.realParseFloat(document.getElementById('totalMts2Cielorraso').value);
+		const totalMtsMolduras = COMMONS.realParseFloat(document.getElementById('totalMtsMolduras').value);
+
 		let sumaRev = 0,
 			sumaCie = 0,
 			sumaMol = 0;
 
 		this.productosSelecEnAmbiente.forEach( prod => {
 
-			switch (prod.tipoProducto) {
-				case 'Revestimiento':
-					sumaRev += COMMONS.realParseFloat(prod.mts2Placas);
-					break;
-				case 'Cielorraso':
-					sumaCie += COMMONS.realParseFloat(prod.mts2Placas);
-					break;
-				case 'Molduras':
-					sumaMol += COMMONS.realParseFloat(prod.mts2Placas);
-					break;
+			if (prod.idEstadoItem === 0) {
+				switch (prod.tipoProducto) {
+					case 'Revestimiento':
+						sumaRev += COMMONS.realParseFloat(prod.mts2Placas);
+						break;
+					case 'Cielorraso':
+						sumaCie += COMMONS.realParseFloat(prod.mts2Placas);
+						break;
+					case 'Molduras':
+						sumaMol += COMMONS.realParseFloat(prod.mts2Placas);
+						break;
+				}
 			}
 		});
 
 		document.getElementById('importePresup').value = importePresup - this.importeAmbEliminado;
-		document.getElementById('totalMts2Revest').value = sumaRev;
-		document.getElementById('totalMts2Cielorraso').value = sumaCie;
-		document.getElementById('totalMtsMolduras').value = sumaMol;
+
+		//console.log('Suma Revest:', sumaRev, ' - En productosSelecEnAmbiente:', sumaRev);
+
+		document.getElementById('totalMts2Revest').value = totalMts2Revest - sumaRev;
+		document.getElementById('totalMts2Cielorraso').value = totalMts2Cielorraso - sumaCie;
+		document.getElementById('totalMtsMolduras').value = totalMtsMolduras - sumaMol;
 	}
 
 	async salvarProductosDeAmbientes(url, idcomp) {
@@ -204,38 +224,57 @@ class IngresoProds {
 				idComprobante: idcomp,
 				productos: this.productosSelecEnAmbiente
 			};
-			//console.log(this.productosSelecEnAmbiente);
+			//console.log('Productos en ambientes a salvar:', this.productosSelecEnAmbiente);
 			datos = JSON.stringify(datos);
-
 	        const options = { method: 'POST',
 	        				  headers: {
 	      						'Content-Type': 'application/json' },
 	                          body: datos };
-
 	        const res = await fetch(url, options);
 			const data = await res.json();
 	        //console.log('Status guardar ambientes:', data);
+	        // Recargo la lista de productos, para actualizar los ids de registros (los nuevos son 0)
+	        this.recargarProductos(PRESUP.id_registro, PRESUP.pathGetProductos);
+	        // Habilito boton de imprimir
+	        document.getElementById('btnImprimePresupuesto').disabled = false;
 	    }
 	    return null;
 	}
 
+	recargarProductos(id, url) {
+		const endPoint = url + id;
+		const data = fetchData.obtener(endPoint);
+		this.productosSelecEnAmbiente = [];		// Vacio array de productos
+
+		data.then(resp => {
+			resp.forEach(prod => {
+				delete prod.created_at;		//	Elimino propiedades no necesarias
+				delete prod.updated_at;		// idem
+				this.productosSelecEnAmbiente.push(prod);
+			});
+		});
+	}
+
 	buscarProductos(id, url) {
 		const endPoint = url + id;
-
 		const data = fetchData.obtener(endPoint);
 
 		data.then( resp => {
-			//console.log('Productos:', resp);
+			//console.log('Productos de Ambientes (GET):', resp);
 			if (resp.status) {		// Si devuelve status, es que NO hay productos
-				console.log(resp);
+				//console.log(resp);
 				return null;
 			} else {
+
 				resp.forEach( (prod, idx) => {
 					delete prod.created_at;		//	Elimino propiedades no necesarias
 					delete prod.updated_at;		// idem
 					this.productosSelecEnAmbiente.push(prod);
 					// Producto a la lista de productos de pantalla
+
+// Ver si esta const debe ir fuera del loop
 					const uiTabProds = new UiTablaProductos(this.estadosItem);
+
 					uiTabProds.insertarProd( prod, prod.idAmbiente );
 				});
 			}
@@ -247,7 +286,7 @@ class IngresoProds {
 			if (prod.idAmbiente == idAmb && 
 				prod.idProducto == idProd &&
 				prod.idTipoProducto == idTipoProd) {
-				prod.idEstadoItem = parseInt(value);
+					prod.idEstadoItem = parseInt(value);
 			}
 			return prod;
 		});
@@ -264,28 +303,35 @@ class IngresoProds {
 	_armarObjProducto() {
 		const selTipoProd = document.getElementById('selTipoProd');
 		const selProducts = document.getElementById('selProductos');
-		//const selEstado   = document.getElementById('selEstado');
 
-		return { idAmbiente:     this.idAmbienteSelecionado,
-				 idTipoProducto: selTipoProd.value,
+		return { id: 0,			// Al ser nuevo el producto, no tiene id de registro en la tabla
+				 idAmbiente:     this.idAmbienteSelecionado,
+				 idTipoProducto: parseInt(selTipoProd.value),
 				 tipoProducto:   selTipoProd.options[ selTipoProd.selectedIndex ].text,	 // Tipo Prod    -- GRILLA PRODUCTOS
-				 idProducto:     selProducts.value,										 // Código
+				 idProducto:     parseInt(selProducts.value),										 // Código
 				 producto:       selProducts.options[ selProducts.selectedIndex ].text,	 // Descripcion
 				 concepTrab:     document.getElementById('conceptoTrabajo').value,		 // Concepto
-				 anchoTrab:      document.getElementById('anchoTrabajo').value,			 // Ancho        -- MEDIDAS TRABAJO
-				 altoTrab:       document.getElementById('altoTrabajo').value,			 // Alto
-				 mts2Trabajo:    document.getElementById('mts2Trabajo').value,			 // Mts2/Mts
-				 anchoPlaca:     document.getElementById('placaMedidaAncho').value,		 // Ancho        -- MEDIDAS PLACAS
-				 altoPlaca:      document.getElementById('placaMedidaAlto').value,		 // Alto
-				 mts2Placas:     document.getElementById('tdPlacasCubrenMts2').innerHTML, // CubrenMts2
-				 precioXmt2:	 document.getElementById('tdPlacaPrecioXmt2').innerHTML,  // Precio x mt2 
-				 cantPlacAncho:  document.getElementById('tdCantPlacSugAncho').innerHTML, // Cant. Ancho  -- CANTIDAD DE PLACAS
-				 cantPlacAlto:   document.getElementById('tdCantPlacSugAlto').innerHTML,  // Cant. Alto
-				 cantPlacas:     document.getElementById('tdCantPlacSugCant').innerHTML,  // Cant. Placas
-				 importeTotal:   document.getElementById('importeProd').value,			 // Importe total				 
-				 idEstadoItem:   1 //selEstado.value,								     // id Estado
-				 //estadoItem:    selEstado.options[ selEstado.selectedIndex ].text
+				 anchoTrab:      this._stringToFloat(document.getElementById('anchoTrabajo').value),			 // Ancho        -- MEDIDAS TRABAJO
+				 altoTrab:       this._stringToFloat(document.getElementById('altoTrabajo').value),			 // Alto
+				 mts2Trabajo:    this._stringToFloat(document.getElementById('mts2Trabajo').value),			 // Mts2/Mts
+				 anchoPlaca:     this._stringToFloat(document.getElementById('placaMedidaAncho').value),		 // Ancho        -- MEDIDAS PLACAS
+				 altoPlaca:      this._stringToFloat(document.getElementById('placaMedidaAlto').value),		 // Alto
+				 mts2Placas:     this._stringToFloat(document.getElementById('tdPlacasCubrenMts2').innerHTML), // CubrenMts2
+				 precioXmt2:	 this._stringToFloat(document.getElementById('tdPlacaPrecioXmt2').innerHTML),  // Precio x mt2 
+				 cantPlacAncho:  parseInt(document.getElementById('tdCantPlacSugAncho').innerHTML), // Cant. Ancho  -- CANTIDAD DE PLACAS
+				 cantPlacAlto:   parseInt(document.getElementById('tdCantPlacSugAlto').innerHTML),  // Cant. Alto
+				 cantPlacas:     parseInt(document.getElementById('tdCantPlacSugCant').innerHTML),  // Cant. Placas
+				 importeTotal:   this._stringToFloat(document.getElementById('importeProd').value),			 // Importe total
+				 idEstadoItem:   1  // id Estado
 		};
+	}
+
+	_stringToFloat(value) {
+		if (value === '' || value === 0) return 0;
+		let numFloat = value.replace('.', '');
+		numFloat = numFloat.replace(',', '.');
+
+		return parseFloat(numFloat);
 	}
 
 	_cambiarComasPorPuntos(value) {
@@ -347,7 +393,15 @@ class UiTablaProductos {
 		this.estadosItem = estados;
 	}
 
+	/**
+	 * Inserta producto en tabla de productos, en ambiente
+	 * 
+	 * @param  {object} obj [Objeto con los datos del producto]
+	 * @param  {int} idx [Indice del ambiente]
+	 * @return void
+	 */
 	insertarProd(obj, idx) {
+		//console.log('idx ambiente producto:', idx, 'Objeto que recibe:', obj);
 		const idElem = `idBodyTablaProds-${idx}`;
 		const elem = document.getElementById(idElem);
 		// Armo la linea

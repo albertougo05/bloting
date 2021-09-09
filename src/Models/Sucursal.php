@@ -14,5 +14,12 @@ class Sucursal extends Model
 	protected $table = 'blo_Sucursales';
 
 	// Lista de campos modificables:
+	protected $fillable = [
+		'nroSucursal',
+		'direccion',
+		'localidad',
+		'provincia',
+		'pais'
+	];
 
 }
